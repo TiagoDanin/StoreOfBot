@@ -30,17 +30,51 @@ const error = (res) => {
 	}
 }
 
-const findAll = async (name) => {
+const insert = async (db, table='bots') => {
+	let data = {}
+	let client = await pool.connect()
+
+	const listKeys = Object.keys(db)
+	const query = `
+		INSERT
+		INTO ${table}(${
+			listKeys.join(', ')
+		})
+		VALUES (${
+			listKeys.reduce((t, e, i) => {
+				if (i == 0) {
+					return '$1'
+				}
+				return `${t}, $${i+1}`
+			}, '')
+		})
+		RETURNING *;
+	`
+
+	data = await client.query(
+		query,
+		listKeys.map((e) => db[e])
+	).catch(error)
+
+	client.release()
+	if (data.rowCount != 1) {
+		return false
+	}
+	return data.rows[0]
+}
+
+const select = async (table='bots') => {
 	let data = {}
 	let client = await pool.connect()
 	data = await client.query(`
 		SELECT *
-		FROM ${name};
+		FROM ${table};
 	`, []).catch(error)
 	client.release()
 	return data.rows
 }
 
 module.exports = {
-	findAll
+	select,
+	insert
 }

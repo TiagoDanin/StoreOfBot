@@ -173,7 +173,6 @@ config.plugins.forEach(p => {
 		bot.hears(_.regex, async (ctx) => {
 			dlogPlugins(`Runnig cmd plugin: ${_.id}`)
 			try {
-				if (!ctx.db && _.onlyUser) return false
 				await _.plugin(ctx)
 			} catch (e) {
 				processError(e, ctx, _)
