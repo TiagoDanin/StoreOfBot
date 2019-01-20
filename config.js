@@ -3,7 +3,8 @@ module.exports = {
 		'backup',
 		'ping'
 	],
-	category: [],
+	types: [],
+	categories: [],
 	defaultLang: 'en',
 	locales: [],
 }

@@ -18,7 +18,7 @@ Query.prototype.submit = function() {
 
 const { Pool } = pg
 const pool = new pg.Pool({
-	database: 'test'
+	database: 'storeofbot'
 })
 
 const error = (res) => {
