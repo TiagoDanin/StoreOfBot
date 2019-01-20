@@ -7,21 +7,9 @@ const session = require('telegraf/session')
 
 const config = require('./config')
 const database = require('./database')
-const levels = require('./levels')
-
-const items = {
-	...require('./items/bank'),
-	//...require('./items/battle'),
-	...require('./items/bomb'),
-	...require('./items/hospital'),
-	...require('./items/null'),
-	...require('./items/rocket'),
-	...require('./items/tower'),
-	...require('./items/zones')
-}
 
 const bot = new Telegraf(process.env.telegram_token, {
-	username: 'DefendTheCastleBot'
+	username: 'StoreOfBot'
 })
 const dlogBot = debug("bot")
 const dlogPlugins = debug("bot:plugins")
@@ -34,7 +22,7 @@ dlogBot("Start bot")
 let startLog = `
 #Start
 <b>BOT START</b>
-<b>Username:</b> @DefendTheCastleBot
+<b>Username:</b> @StoreOfBot
 `
 bot.telegram.sendMessage(process.env.log_chat,
 	startLog, {
@@ -166,113 +154,8 @@ bot.use((ctx, next) => {
 })
 
 bot.context.database = database
-bot.context.castles = config.castles
-bot.context.items = items
+bot.context.config = config
 bot.context.fixKeyboard = Array(90).join('\u0020') + '\u200B'
-bot.context.userInfo = async (ctx, onlyUser) => {
-	if (typeof ctx != 'object') {
-		ctx = {
-			from: ctx //ctx == id
-		}
-	}
-	let db = await database.getUser(ctx.from.id)
-	if (!db) {
-		if (typeof ctx == 'object' && onlyUser) {
-			await ctx.replyWithMarkdown('*What\'s the name of your town?*', {
-				reply_markup: {
-					force_reply: true
-				}
-			})
-		}
-		return false
-	}
-	var data = {
-		opponent: 0,
-		maxLevel: levels.length,
-		levelPoc: 0,
-		maxTroops: 7,
-		plusAtack: 0,
-		plusShield: 0,
-		plusLife: 0,
-		plusXp: 0,
-		plusMoney: 0,
-		moneyPerHour: 0,
-		log: [],
-		old: {...db},
-		...db,
-		...config.class[db.type],
-		castle: config.castles[db.city[12]] || '🏰'
-	}
-	data.inventory = data.inventory.reduce((total, id) => {
-		if (id != 0) {
-			total.push(id)
-		}
-		return total
-	}, [0])
-	data.allItems = data.city.reduce((total, id, index) => {
-		if (id != 12) {
-			total.push({
-				...items[id],
-				city: true
-			})
-		}
-		return total
-	}, data.inventory.map((id) => {
-		return {
-			...items[id],
-			inventory: true
-		}
-	}))
-	for (var item of data.allItems) {
-		if (item.doDb) {
-			data = item.doDb(data)
-		}
-		if (data.run && item.doTime) {
-			data = item.doTime(data)
-		}
-	}
-	data.money = Math.floor(data.money)
-	if (data.run) {
-		if (data.timerunning >= 259200) {//3 days in s
-			data.xp = 0
-			data.level--
-			if (data.level < 1) {
-				data.level = 1
-			}
-			data.money = Math.floor(data.old.money / 1.4)
-			database.saveUser(ctx)
-			ctx.replyWithMarkdown('*‼️ The villagers are gone! (3 Days Offline)*')
-			return data
-		}
-
-		if (data.troops < data.maxTroops) {
-			if (data.timerunning >= 120) {
-				const winTroops = Math.floor(data.timerunning / 120)
-				data.troops += winTroops
-				if (data.troops > data.maxTroops) {
-					data.troops = data.maxTroops
-				}
-			} else {
-				data.troops++
-			}
-		}
-
-		if (data.level < data.maxLevel && data.xp >= levels[data.level+1]) {
-			data.level++
-			data.xp -= levels[data.level]
-		}
-		database.saveUser(ctx)
-	}
-	data.levelPoc = Math.floor(
-		data.xp / (
-			(levels[data.level+1] || 9999999999999999) / 100
-		)
-	)
-	if (data.levelPoc >= 100) {
-		data.levelPoc = 99
-	}
-	return data
-}
 
 config.plugins.forEach(p => {
 	var _ = require(`./plugins/${p}`)
@@ -290,7 +173,6 @@ config.plugins.forEach(p => {
 		bot.hears(_.regex, async (ctx) => {
 			dlogPlugins(`Runnig cmd plugin: ${_.id}`)
 			try {
-				ctx.db = await ctx.userInfo(ctx, _.onlyUser)
 				if (!ctx.db && _.onlyUser) return false
 				await _.plugin(ctx)
 			} catch (e) {
@@ -322,8 +204,6 @@ bot.on('message', async (ctx) => {
 				msg.text
 			]
 			try {
-				ctx.db = await ctx.userInfo(ctx)
-				//if (!ctx.db) return false
 				await _.reply(ctx)
 			} catch (e) {
 				processError(e, ctx, _)
@@ -340,8 +220,6 @@ bot.on('callback_query', async (ctx) => {
 				ctx.match = [].concat(data, data.split(':'))
 				dlogCallback(`Runnig callback plugin: ${_.id}`)
 				try {
-					ctx.db = await ctx.userInfo(ctx)
-					//if (!ctx.db) return false
 					await _.callback(ctx)
 				} catch (e) {
 					processError(e, ctx, _)
