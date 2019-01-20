@@ -1,7 +1,8 @@
 module.exports = {
 	plugins: [
 		'backup',
-		'ping'
+		'ping',
+		'singup'
 	],
 	types: [],
 	categories: [],
