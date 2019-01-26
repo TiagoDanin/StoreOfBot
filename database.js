@@ -63,13 +63,24 @@ const insert = async (db, table='bots') => {
 	return data.rows[0]
 }
 
-const select = async (table='bots') => {
+const select = async (where={}, table='bots') => {
 	let data = {}
 	let client = await pool.connect()
-	data = await client.query(`
-		SELECT *
-		FROM ${table};
-	`, []).catch(error)
+	data = await client.query(
+		`
+			SELECT *
+			FROM ${table}
+			${
+				Object.keys(where).reduce((t, e, i) => {
+					if (i == 0) {
+						return `WHERE ${e} = $1`
+					}
+					return `${t} AND ${e} = $${i+1}`
+				}, '')
+			};
+		`,
+		Object.keys(where).map(e => where[e])
+	).catch(error)
 	client.release()
 	return data.rows
 }

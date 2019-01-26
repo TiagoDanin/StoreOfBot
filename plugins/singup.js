@@ -1,9 +1,17 @@
+const Telegraf = require('telegraf')
+
 const types = {
 	//'name': 'Name (Example Bot):',
 	//'username': 'Username (examplebot):',
+	'token': 'Send the bot token to confirm:', //TODO MSG UPDATE
 	'description': 'Description:',
 	'categories': 'Categories (Max 3):',
 	'types': 'Types:'
+}
+
+const testToken = async (token) => {
+	const bot = new Telegraf(token)
+	return await bot.telegram.getMe().catch(() => false)
 }
 
 const status = (key) => key ? '✅' : '❌'
@@ -68,7 +76,7 @@ const base = async (ctx) => {
 			}
 		}
 		if (typeof input == 'string') {
-			if (!input.match(/^([a-zA-Z0-9\s!çÇ&]{12,160})$/g)) {
+			if (!input.match(/^([a-zA-Z0-9\s!çÇ&:-_]{12,160})$/g)) {
 				return ctx.replyWithHTML(`
 <b>Text must have only letter and number with 12-160 characters!</b>
 ${types[ctx.session.singup.type]}
@@ -77,7 +85,20 @@ ${types[ctx.session.singup.type]}
 				})
 			}
 		}
-		ctx.session.singup.db[type] = input
+		if (type == 'token') {
+			const bot = await testToken(input)
+			console.log(bot)
+			if (!bot || bot.id != ctx.session.singup.db.id) {
+				return ctx.replyWithHTML(`
+<b>Token invalid!</b>
+${types[ctx.session.singup.type]}
+					`, {
+					reply_markup: reply_markup
+				})
+			}
+		} else {
+			ctx.session.singup.db[type] = input
+		}
 
 		const keyTypes = Object.keys(types)
 		const nextType = keyTypes.indexOf(type) + 1
@@ -147,8 +168,10 @@ const start = async (ctx) => {
 	if (!ctx.forward.is_bot) {
 		return ctx.replyWithMarkdown('This not is an bot!')
 	}
+
 	ctx.session.singup = {
 		type: 'description',
+		update: false,
 		db: {
 			id: ctx.forward.id,
 			name: ctx.forward.first_name,
@@ -158,6 +181,14 @@ const start = async (ctx) => {
 			categories: {},
 			types: {}
 		}
+	}
+
+	let bots = await ctx.database.select({id: ctx.forward.id})
+	if (bots.length != 0) {
+		if (bots[0].admin != ctx.from.id) {
+			ctx.session.singup.type = 'token'
+		}
+		ctx.session.singup.update = true
 	}
 
 	ctx.config.categories.forEach((el) => {
