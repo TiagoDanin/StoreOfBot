@@ -15,7 +15,7 @@ const main = async () => {
 			name             TEXT       NOT NULL,
 			username         TEXT       NOT NULL,
 			description      TEXT       NOT NULL,
-			score            INT        DEFAULT 0,
+			score            FLOAT      DEFAULT 0,
 			types            INT[]      DEFAULT '{}',
 			categories       INT[]      DEFAULT '{}',
 			scores           JSONB      DEFAULT '{}',

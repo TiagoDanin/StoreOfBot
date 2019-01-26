@@ -21,6 +21,13 @@ const orders = [{
 
 const status = (key) => key ? '✅' : '❌'
 
+const showcategories = (ctx, categories) => {
+	return categories.map((e) => {
+		const name = ctx.config.categories[e]
+		return name.replace(/^./, name[0].toUpperCase())
+	})
+}
+
 const toIndex = (ctx, type) => {
 	return ctx.session.list[type].map((e) => {
 		return ctx.config[type].indexOf(e)
@@ -64,16 +71,15 @@ const base = async (ctx) => {
 		}
 	}
 
-	//orders.find(e => e.id == ctx.match[3]).id
-	if (ctx.match[2] == 'orders' && ctx.match[3]) {
+	if (ctx.match[2] == 'order' && ctx.match[3]) {
 		ctx.session.list.order = ctx.match[3]
 	} else if (ctx.match[2] == 'back') {
 		ctx.session.list.page--
 	} else if (ctx.match[2] == 'next') {
 		ctx.session.list.page++
 	}
-	if (ctx.session.list < 0) {
-		ctx.session.list = 0
+	if (ctx.session.list.page < 0) {
+		ctx.session.list.page = 0
 	}
 
 	let bots = await ctx.database.selectWithFilter(
@@ -83,11 +89,18 @@ const base = async (ctx) => {
 		orders.find(e => e.id == ctx.session.list.order).query
 	)
 
-	let text = `
-1. Test - Jogos | Filmes | Utilidades
-My test bot in Telegram
-@TestBot, ⭐️(5.0), 👥(666)
-	`
+	let text = bots.reduce((total, bot, index) => {
+		let view = `
+${index+1 + (ctx.session.list.page * 3)}. ${bot.name} - ⭐️(${bot.score}) | 👥(${Object.keys(bot.scores).length})
+@${bot.username} - ${showcategories(ctx, bot.categories).join(' | ')}
+${bot.description}
+		` //Add click in categories
+		if (index == 0) {
+			return view
+		}
+		return total + view
+	}, 'Without Bots!')
+
 	let keyboard = [
 		[
 			{text: '◀️ Back' , callback_data: 'list:back'},
@@ -95,7 +108,7 @@ My test bot in Telegram
 		],
 		[
 			{text: `⚙️ Categories`, callback_data: 'list:categories'},
-			{text: `📈 Order`, callback_data: 'list:order'}
+			{text: `📈 Order (${orders.find(e => e.id == ctx.session.list.order).name})`, callback_data: 'list:order'}
 		],
 		[
 			{text: `⚖️ Advanced Filter`, callback_data: 'list:types'}
