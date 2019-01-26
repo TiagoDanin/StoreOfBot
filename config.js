@@ -1,7 +1,10 @@
 module.exports = {
 	plugins: [
 		'backup',
+		//'list',
+		//'menu',
 		'ping',
+		//'rate',
 		'singup'
 	],
 	types: ['programming'],
