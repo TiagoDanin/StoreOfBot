@@ -1,7 +1,7 @@
 module.exports = {
 	plugins: [
 		'backup',
-		//'list',
+		'list',
 		//'menu',
 		'ping',
 		//'rate',
