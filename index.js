@@ -11,12 +11,13 @@ const database = require('./database')
 const bot = new Telegraf(process.env.telegram_token, {
 	username: 'StoreOfBot'
 })
-const dlogBot = debug("bot")
-const dlogPlugins = debug("bot:plugins")
-const dlogReply = debug("bot:reply")
-const dlogInline = debug("bot:inline")
-const dlogCallback = debug("bot:callback")
-const dlogError = debug("bot:error")
+const dlogBot = debug('bot')
+const dlogPlugins = debug('bot:plugins')
+const dlogReply = debug('bot:reply')
+const dLogForward = debug('bot:forward')
+const dlogInline = debug('bot:inline')
+const dlogCallback = debug('bot:callback')
+const dlogError = debug('bot:error')
 
 dlogBot("Start bot")
 let startLog = `
@@ -127,9 +128,10 @@ const processError = (error, ctx, plugin) => {
 	)
 }
 
-var inline = []
-var callback = []
-var reply = []
+let inline = []
+let callback = []
+let reply = []
+let forward = []
 
 bot.use((ctx, next) => telegrafStart(ctx, next))
 bot.use(session({
@@ -191,6 +193,10 @@ config.plugins.forEach(p => {
 	if (_.reply) {
 		reply.push(_)
 	}
+
+	if (_.forward) {
+		forward.push(_)
+	}
 })
 
 bot.on('message', async (ctx) => {
@@ -204,6 +210,16 @@ bot.on('message', async (ctx) => {
 			]
 			try {
 				await _.reply(ctx)
+			} catch (e) {
+				processError(e, ctx, _)
+			}
+		}
+	} else if (msg.forward_from) {
+		for (var _ of forward) {
+			dLogForward(`Runnig Forward plugin: ${_.id}`)
+			ctx.forward = msg.forward_from
+			try {
+				await _.forward(ctx)
 			} catch (e) {
 				processError(e, ctx, _)
 			}

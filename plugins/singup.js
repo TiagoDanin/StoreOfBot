@@ -1,7 +1,7 @@
 const types = {
-	'name': 'Name (Example Bot):',
-	'username': 'Username (examplebot):',
-	'description': 'Description (Search example in examples):',
+	//'name': 'Name (Example Bot):',
+	//'username': 'Username (examplebot):',
+	'description': 'Description:',
 	'categories': 'Categories (Max 3):',
 	'types': 'Types:'
 }
@@ -55,7 +55,7 @@ const base = async (ctx) => {
 					ctx.session.singup.db.categories
 				)
 				if (input.length > 3 || input.length <= 0) {
-					return //TODO Show alert
+					return ctx.answerCbQuery('Select 1-3 categories!')
 				}
 			} else if (type == 'types') {
 				input = getValues(
@@ -63,12 +63,19 @@ const base = async (ctx) => {
 					ctx.session.singup.db.types
 				)
 				if (input.length <= 0) {
-					return //TODO Show alert
+					return ctx.answerCbQuery('Select an option!', true)
 				}
 			}
 		}
 		if (typeof input == 'string') {
-			//TODO Valid via regex
+			if (!input.match(/^([a-zA-Z0-9\s!çÇ&]{12,160})$/g)) {
+				return ctx.replyWithHTML(`
+<b>Text must have only letter and number with 12-160 characters!</b>
+${types[ctx.session.singup.type]}
+					`, {
+					reply_markup: reply_markup
+				})
+			}
 		}
 		ctx.session.singup.db[type] = input
 
@@ -115,7 +122,7 @@ const base = async (ctx) => {
 	if (type == 'end') {
 		reply_markup = {
 			inline_keyboard: [[
-				{text: 'Done!', callback_data: 'singup'}
+				{text: 'Done!', callback_data: 'menu'}
 			]]
 		}
 		await ctx.database.insert(ctx.session.singup.db)
@@ -137,12 +144,16 @@ const base = async (ctx) => {
 }
 
 const start = async (ctx) => {
+	if (!ctx.forward.is_bot) {
+		return ctx.replyWithMarkdown('This not is an bot!')
+	}
 	ctx.session.singup = {
-		type: 'name',
+		type: 'description',
 		db: {
-			name: '',
-			username: '',
-			description: '',
+			id: ctx.forward.id,
+			name: ctx.forward.first_name,
+			username: ctx.forward.username,
+			description: '', //TODO Use mtproto
 			admin: ctx.from.id,
 			categories: {},
 			types: {}
@@ -163,13 +174,18 @@ const start = async (ctx) => {
 	})
 }
 
+const info = (ctx) => {
+	return ctx.replyWithMarkdown('*Forward a message* from your bot in my private!')
+}
+
 module.exports = {
 	id: 'singup',
-	plugin: start,
 	callback: base,
 	reply: base,
+	forward: start,
+	plugin: info,
 	regex: [
-		/^\/start/i,
-		/^\/test/i,
+		/^\/singup/i
+		///^\/start ([\w\d]*bot)$/i
 	]
 }
