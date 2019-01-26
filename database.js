@@ -85,7 +85,40 @@ const select = async (where={}, table='bots') => {
 	return data.rows
 }
 
+const update = async (db, table='bots') => {
+	let data = {}
+	let client = await pool.connect()
+
+	const listKeys = Object.keys(db)
+	const query = `
+		UPDATE ${table}
+			SET
+				${
+					listKeys.reduce((total, e, index) => {
+						return `${total},
+						${e} = $${index+2}`
+					}, 'time = now()')
+				}
+			WHERE id = $1
+		RETURNING *;
+	`
+
+	data = await client.query(
+		query,
+		listKeys.reduce((total, e) => {
+			total.push(db[e])
+			return total
+		}, [db.id])
+	).catch(error)
+	client.release()
+	if (data.rowCount != 1) {
+		return false
+	}
+	return data.rows[0]
+}
+
 module.exports = {
 	select,
-	insert
+	insert,
+	update
 }

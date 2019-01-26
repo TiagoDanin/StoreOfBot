@@ -146,7 +146,12 @@ ${types[ctx.session.singup.type]}
 				{text: 'Done!', callback_data: 'menu'}
 			]]
 		}
-		await ctx.database.insert(ctx.session.singup.db)
+		if (ctx.session.singup.update) {
+			await ctx.database.update(ctx.session.singup.db)
+		} else {
+			await ctx.database.insert(ctx.session.singup.db)
+		}
+		ctx.session.singup = {} //Reset
 		text += 'Done!'
 	} else {
 		text += `📌 <b>${types[ctx.session.singup.type]}</b>`
