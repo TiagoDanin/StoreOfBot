@@ -7,18 +7,9 @@ const base = async (ctx) => {
 	ctx.telegram.sendDocument(
 		process.env.log_chat,
 		{
-			filename: 'Users.backup.JSON',
+			filename: 'Bots.backup.JSON',
 			source: Buffer.from(stringify(
-				await ctx.database.findAllTable('users')
-			), 'utf8')
-		}
-	)
-	ctx.telegram.sendDocument(
-		process.env.log_chat,
-		{
-			filename: 'Stats.backup.JSON',
-			source: Buffer.from(stringify(
-				await ctx.database.findAllTable('stats')
+				await ctx.database.select()
 			), 'utf8')
 		}
 	)
