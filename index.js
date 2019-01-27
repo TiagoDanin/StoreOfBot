@@ -25,7 +25,7 @@ let startLog = `
 <b>BOT START</b>
 <b>Username:</b> @StoreOfBot
 `
-bot.telegram.sendMessage(process.env.log_chat,
+bot.telegram.sendMessage(config.ids.log,
 	startLog, {
 		parse_mode: 'HTML'
 	}
@@ -107,7 +107,7 @@ const processError = (error, ctx, plugin) => {
 		text += `\nCHAT ~>\n${clearUser(ctx.chat)}`
 	}
 
-	bot.telegram.sendMessage(process.env.log_chat, text.substring(0, 4000))
+	bot.telegram.sendMessage(config.ids.log, text.substring(0, 4000))
 
 	var jsonData = stringify(fulllog)
 	var remove = (name) => {
@@ -120,7 +120,7 @@ const processError = (error, ctx, plugin) => {
 	].forEach(name => remove(name))
 
 	return bot.telegram.sendDocument(
-		process.env.log_chat,
+		config.ids.log,
 		{
 			filename: `${logId}.log.JSON`,
 			source: Buffer.from(jsonData, 'utf8')
@@ -159,6 +159,16 @@ bot.use((ctx, next) => {
 bot.context.database = database
 bot.context.config = config
 bot.context.fixKeyboard = Array(90).join('\u0020') + '\u200B'
+
+bot.use((ctx, next) => {
+	ctx.privilege = 0
+	if (config.ids.admins.includes(ctx.from.id)) {
+		ctx.privilege = 7
+	} else if (config.ids.mods.includes(ctx.from.id)) {
+		ctx.privilege = 5
+	}
+	return next(ctx)
+})
 
 bot.use(async (ctx, next) => {
 	ctx.db = await ctx.database.select({

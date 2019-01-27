@@ -21,11 +21,15 @@ const orders = [{
 
 const status = (key) => key ? '✅' : '❌'
 
+const link = (ctx, cmd, name) => {
+	return `<a href="https://telegram.me/${ctx.options.username}?start=${cmd}">${name}</a>`
+}
+
 const showcategories = (ctx, categories) => {
 	return categories.map((e) => {
 		let name = ctx.config.categories[e]
 		name = name.replace(/^./, name[0].toUpperCase())
-		return `<a href="https://telegram.me/${ctx.options.username}?start=categories-${e}">${name}</a>`
+		return link(ctx, `categories-${e}`, name)
 	})
 }
 
@@ -103,10 +107,10 @@ const base = async (ctx) => {
 
 	let text = bots.reduce((total, bot, index) => {
 		let view = `
-${index+1 + (ctx.session.list.page * 3)}. ${bot.name} - ⭐️(${bot.score}) | 👥(${Object.keys(bot.scores).length})
+${index+1 + (ctx.session.list.page * 3)}. ${link(ctx, bot.username, bot.name)} - ⭐️(${link(ctx, bot.username, bot.score)}) | 👥(${link(ctx, bot.username, Object.keys(bot.scores).length)}) | (${link(ctx, `report-${bot.id}`, 'Report')})
 @${bot.username} - ${showcategories(ctx, bot.categories).join(' | ')}
 ${bot.description}
-		` //Add click in categories
+		`
 		if (index == 0) {
 			return view
 		}

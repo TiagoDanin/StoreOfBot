@@ -7,6 +7,7 @@ module.exports = {
 		'mylist',
 		'ping',
 		'rate',
+		'report',
 		'singup',
 		'stats'
 	],
@@ -38,4 +39,9 @@ module.exports = {
 	],
 	defaultLang: 'en',
 	locales: [],
+	ids: {
+		log: '-1001089887511',
+		admins: [89198119, 61029284],
+		mods: []
+	}
 }

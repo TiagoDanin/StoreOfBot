@@ -1,11 +1,11 @@
 const stringify = require('json-stringify-safe')
 const base = async (ctx) => {
-	if (process.env.log_chat != ctx.chat.id) {
+	if (ctx.privilege <= 6) {
 		return
 	}
-	ctx.telegram.sendMessage(process.env.log_chat, '#Backup')
+	ctx.telegram.sendMessage(ctx.config.ids.log, '#Backup')
 	ctx.telegram.sendDocument(
-		process.env.log_chat,
+		ctx.config.ids.log,
 		{
 			filename: 'Bots.backup.JSON',
 			source: Buffer.from(stringify(

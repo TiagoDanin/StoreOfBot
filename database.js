@@ -117,6 +117,28 @@ const update = async (db, table='bots') => {
 	return data.rows[0]
 }
 
+const del = async (where={}, table='bots') => {
+	let data = {}
+	let client = await pool.connect()
+	data = await client.query(
+		`
+			DELETE
+			FROM ${table}
+			${
+				Object.keys(where).reduce((t, e, i) => {
+					if (i == 0) {
+						return `WHERE ${e} = $1`
+					}
+					return `${t} AND ${e} = $${i+1}`
+				}, '')
+			};
+		`,
+		Object.keys(where).map(e => where[e])
+	).catch(error)
+	client.release()
+	return data
+}
+
 const selectWithFilter = async (
 	categories=[],
 	types=[],
@@ -142,6 +164,7 @@ const selectWithFilter = async (
 module.exports = {
 	select,
 	selectWithFilter,
+	del,
 	insert,
 	update
 }
