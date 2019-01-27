@@ -23,8 +23,9 @@ const status = (key) => key ? '✅' : '❌'
 
 const showcategories = (ctx, categories) => {
 	return categories.map((e) => {
-		const name = ctx.config.categories[e]
-		return name.replace(/^./, name[0].toUpperCase())
+		let name = ctx.config.categories[e]
+		name = name.replace(/^./, name[0].toUpperCase())
+		return `<a href="https://telegram.me/${ctx.options.username}?start=categories-${e}">${name}</a>`
 	})
 }
 
@@ -36,6 +37,9 @@ const toIndex = (ctx, type) => {
 
 const change = (ctx, type) => {
 	const key = ctx.match[3]
+	if (ctx.session.list[type].length == ctx.config[type].length) {
+		ctx.session.list[type] = []
+	}
 	if (ctx.session.list[type].includes(key)) {
 		ctx.session.list[type] = ctx.session.list[type].filter(e => e != key)
 	} else if (ctx.config[type].includes(key)){ //Anti-hack
@@ -65,13 +69,15 @@ const base = async (ctx) => {
 	if (!ctx.session.list) {
 		ctx.session.list = {
 			page: 0,
-			order: 'name',
+			order: 'new',
 			categories: ctx.config.categories,
 			types: [ctx.config.types[0]]
 		}
 	}
 
-	if (ctx.match[2] == 'order' && ctx.match[3]) {
+	if (ctx.match[1] == 'cat' && ctx.match[2]) {
+		ctx.session.list.categories = [ctx.config.categories[Number(ctx.match[2])]]
+	} else if (ctx.match[2] == 'order' && ctx.match[3]) {
 		ctx.session.list.order = ctx.match[3]
 	} else if (ctx.match[2] == 'back') {
 		ctx.session.list.page--
@@ -107,7 +113,13 @@ ${bot.description}
 			{text: '▶️ Next' , callback_data: 'list:next'}
 		],
 		[
-			{text: `⚙️ Categories`, callback_data: 'list:categories'},
+			{text: `⚙️ Categories${
+				ctx.session.list.categories.length <= 2 ? ` (${
+					ctx.session.list.categories.map((e) => {
+						return e.replace(/^./, e[0].toUpperCase())
+					}).join(' & ')
+				})` : (ctx.session.list.categories.length == ctx.config.categories.length ? ' (All)' : '')
+			}`, callback_data: 'list:categories'},
 			{text: `📈 Order (${orders.find(e => e.id == ctx.session.list.order).name})`, callback_data: 'list:order'}
 		],
 		[
@@ -164,6 +176,7 @@ module.exports = {
 	callback: base,
 	plugin: base,
 	regex: [
+		/^\/(cat)egories\s(\d*)$/i,
 		/^\/start/i
 	]
 }
