@@ -2,7 +2,7 @@ const base = async (ctx) => {
 	let text = 'Welcome!'
 	let keyboard = [
 		[
-			{text: '🤖 Bots' , callback_data: 'list' }
+			{text: '🤖 Bots' , callback_data: 'list'}
 		],
 		[
 			{text: '📝 My List', callback_data: 'mylist'}
@@ -11,7 +11,8 @@ const base = async (ctx) => {
 			{text: '❇️ Add/Edit You Bot', callback_data: 'menu:singup'}
 		],
 		[
-			{text: '📔 About' , callback_data: 'menu:about' }
+			{text: '⚙️ Settings', callback_data: 'config'},
+			{text: '📔 About' , callback_data: 'menu:about'}
 		]
 	]
 

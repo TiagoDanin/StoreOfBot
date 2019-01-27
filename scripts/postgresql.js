@@ -9,6 +9,15 @@ const log = (text) => console.log('>>', text)
 const main = async () => {
 	await client.connect()
 	await client.query(`
+		CREATE TABLE users(
+			id               INT        NOT NULL,
+			language         TEXT       DEFAULT 'English',
+			languages        TEXT[]     DEFAULT '{"English"}',
+			notification     BOOLEAN    DEFAULT true,
+			uptime           TIMESTAMP  DEFAULT now(),
+			time             TIMESTAMP  DEFAULT now(),
+			PRIMARY KEY (id)
+		);
 		CREATE TABLE bots(
 			id               INT        NOT NULL,
 			admin            INT        NOT NULL,

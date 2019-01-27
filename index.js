@@ -147,6 +147,7 @@ config.locales.forEach((id) => {
 	r.load(id, `locales/${id}.po`)
 })
 */
+
 bot.use((ctx, next) => {
 	//var langCode = 'en' //checkLanguage(ctx)
 	//var i18n = new Translation(langCode)
@@ -158,6 +159,20 @@ bot.use((ctx, next) => {
 bot.context.database = database
 bot.context.config = config
 bot.context.fixKeyboard = Array(90).join('\u0020') + '\u200B'
+
+bot.use(async (ctx, next) => {
+	ctx.db = await ctx.database.select({
+		id: ctx.from.id
+	}, 'users')
+	if (!ctx.db || ctx.db <= 0) {
+		ctx.db = await ctx.database.insert({
+			id: ctx.from.id
+		}, 'users')
+	} else {
+		ctx.db = ctx.db[0]
+	}
+	return next(ctx)
+})
 
 config.plugins.forEach(p => {
 	var _ = require(`./plugins/${p}`)

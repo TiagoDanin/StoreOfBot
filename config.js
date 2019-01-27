@@ -1,6 +1,7 @@
 module.exports = {
 	plugins: [
 		'backup',
+		'config',
 		'list',
 		'menu',
 		'mylist',
@@ -30,6 +31,10 @@ module.exports = {
 		'Broadcast',
 		'Administration',
 		'Miscellaneous'
+	],
+	languages: [
+		'English',
+		'Português'
 	],
 	defaultLang: 'en',
 	locales: [],
