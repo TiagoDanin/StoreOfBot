@@ -13,6 +13,15 @@ const base = async (ctx) => {
 			), 'utf8')
 		}
 	)
+	ctx.telegram.sendDocument(
+		ctx.config.ids.log,
+		{
+			filename: 'Users.backup.JSON',
+			source: Buffer.from(stringify(
+				await ctx.database.select({}, 'users')
+			), 'utf8')
+		}
+	)
 	return
 }
 
