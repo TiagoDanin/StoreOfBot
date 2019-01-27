@@ -68,7 +68,7 @@ const select = async (where={}, table='bots') => {
 	let client = await pool.connect()
 	data = await client.query(
 		`
-			SELECT *
+			SELECT *, EXTRACT(EPOCH FROM ( now() - time ) ) < 86400 AS online
 			FROM ${table}
 			${
 				Object.keys(where).reduce((t, e, i) => {
