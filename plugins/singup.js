@@ -150,14 +150,17 @@ ${types[ctx.session.singup.type]}
 		} else {
 			await ctx.database.insert(ctx.session.singup.db)
 		}
-		text += `Done!, your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}`
+		await ctx.replyWithMarkdown(`
+Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}
+		`)
+		text += `Done!`
 		ctx.session.singup = {} //Reset
 	} else {
 		text += `📌 <b>${types[ctx.session.singup.type]}</b>`
 	}
 	text += `${ctx.fixKeyboard}`
 
-	if (ctx.updateType == 'callback_query') {
+	if (ctx.updateType == 'callback_query' && type != 'end') {
 		return ctx.editMessageText(text, {
 			parse_mode: 'HTML',
 			reply_markup: reply_markup
