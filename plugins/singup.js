@@ -163,11 +163,13 @@ Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singu
 	if (ctx.updateType == 'callback_query' && type != 'end') {
 		return ctx.editMessageText(text, {
 			parse_mode: 'HTML',
-			reply_markup: reply_markup
+			reply_markup: reply_markup,
+			disable_web_page_preview: true
 		})
 	}
 	return ctx.replyWithHTML(text, {
-		reply_markup: reply_markup
+		reply_markup: reply_markup,
+		disable_web_page_preview: true
 	})
 }
 
