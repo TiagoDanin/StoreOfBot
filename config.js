@@ -4,7 +4,7 @@ module.exports = {
 		'list',
 		'menu',
 		'ping',
-		//'rate',
+		'rate',
 		'singup',
 		'stats'
 	],

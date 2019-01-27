@@ -63,7 +63,7 @@ const base = async (ctx) => {
 					ctx.session.singup.db.categories
 				)
 				if (input.length > 3 || input.length <= 0) {
-					return ctx.answerCbQuery('Select 1-3 categories!')
+					return ctx.answerCbQuery('Select 1-3 categories!', true)
 				}
 			} else if (type == 'types') {
 				input = getValues(
@@ -151,8 +151,8 @@ ${types[ctx.session.singup.type]}
 		} else {
 			await ctx.database.insert(ctx.session.singup.db)
 		}
+		text += `Done!, your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}`
 		ctx.session.singup = {} //Reset
-		text += 'Done!'
 	} else {
 		text += `📌 <b>${types[ctx.session.singup.type]}</b>`
 	}
