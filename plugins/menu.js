@@ -5,7 +5,10 @@ const base = async (ctx) => {
 			{text: '🤖 Bots' , callback_data: 'list' }
 		],
 		[
-			{text: '❇️ Add You Bot', callback_data: 'menu:singup'}
+			{text: '📝 My List', callback_data: 'mylist'}
+		],
+		[
+			{text: '❇️ Add/Edit You Bot', callback_data: 'menu:singup'}
 		],
 		[
 			{text: '📔 About' , callback_data: 'menu:about' }

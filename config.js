@@ -3,6 +3,7 @@ module.exports = {
 		'backup',
 		'list',
 		'menu',
+		'mylist',
 		'ping',
 		'rate',
 		'singup',
