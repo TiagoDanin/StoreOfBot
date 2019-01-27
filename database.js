@@ -117,17 +117,24 @@ const update = async (db, table='bots') => {
 	return data.rows[0]
 }
 
-const selectWithFilter = async (categories=[], types=[], page=0, order='name', table='bots') => {
+const selectWithFilter = async (
+	categories=[],
+	types=[],
+	languages=['English'],
+	page=0,
+	order='name',
+	table='bots'
+) => {
 	let data = {}
 	let client = await pool.connect()
 	data = await client.query(`
 		SELECT *
 		FROM ${table}
-		WHERE categories && $1 AND types && $2
+		WHERE categories && $1 AND types && $2 AND languages && $4
 		ORDER BY ${order}
 		LIMIT 3
 		OFFSET $3;
-	`, [categories, types, page*3]).catch(error)
+	`, [categories, types, page*3, languages]).catch(error)
 	client.release()
 	return data.rows
 }

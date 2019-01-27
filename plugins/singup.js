@@ -6,6 +6,7 @@ const types = {
 	'token': 'Send the bot token to confirm:', //TODO MSG UPDATE
 	'description': 'Description:',
 	'categories': 'Categories (Max 3):',
+	'languages': 'Languages:',
 	'types': 'Types:'
 }
 
@@ -73,6 +74,14 @@ const base = async (ctx) => {
 				if (input.length <= 0) {
 					return ctx.answerCbQuery('Select an option!', true)
 				}
+			} else if (type == 'languages') {
+				input = getValues(
+					ctx.config.languages,
+					ctx.session.singup.db.languages
+				)
+				if (input.length <= 0) {
+					return ctx.answerCbQuery('Select an option!', true)
+				}
 			}
 		}
 		if (typeof input == 'string') {
@@ -106,7 +115,7 @@ ${types[ctx.session.singup.type]}
 	}
 
 	let showKeyboard = false
-	if (['categories', 'types'].includes(type)) {
+	if (['categories', 'types', 'languages'].includes(type)) {
 		showKeyboard = type
 	}
 
@@ -131,6 +140,12 @@ ${types[ctx.session.singup.type]}
 		ctx.config.categories,
 		ctx.session.singup.db.categories
 	).map(e => ctx.config.categories[e]).join(', ')
+}
+<b>Languages:</b> ${
+	getValues(
+		ctx.config.languages,
+		ctx.session.singup.db.languages
+	).map(e => ctx.config.languages[e]).join(', ')
 }
 <b>Types:</b> ${
 	getValues(
@@ -187,6 +202,7 @@ const start = async (ctx) => {
 			username: ctx.forward.username,
 			description: '', //TODO Use mtproto
 			admin: ctx.from.id,
+			languages: {},
 			categories: {},
 			types: {}
 		}

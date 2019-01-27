@@ -30,6 +30,11 @@ const showcategories = (ctx, categories) => {
 }
 
 const toIndex = (ctx, type) => {
+	if (type == 'languages') {
+		return ctx.db.languages.map((e) => {
+			return ctx.config.languages.indexOf(e)
+		})
+	}
 	return ctx.session.list[type].map((e) => {
 		return ctx.config[type].indexOf(e)
 	})
@@ -91,6 +96,7 @@ const base = async (ctx) => {
 	let bots = await ctx.database.selectWithFilter(
 		toIndex(ctx, 'categories'),
 		toIndex(ctx, 'types'),
+		toIndex(ctx, 'languages'),
 		ctx.session.list.page,
 		orders.find(e => e.id == ctx.session.list.order).query
 	)
