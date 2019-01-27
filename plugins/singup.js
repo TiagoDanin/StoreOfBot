@@ -85,7 +85,7 @@ const base = async (ctx) => {
 			}
 		}
 		if (typeof input == 'string') {
-			if (!input.match(/^([a-zA-Z0-9\s!çÇ&:\-_,\.:&\(\)\[\]]{12,160})$/g)) {
+			if (input.match(/[<>\[\]\(\)\*#@]/g || input.length < 12 || input.length > 160)) {
 				return ctx.replyWithHTML(`
 <b>Text must have only letter and number with 12-160 characters!</b>
 ${types[ctx.session.singup.type]}
