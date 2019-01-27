@@ -34,7 +34,7 @@ const insert = async (db, table='bots') => {
 	let data = {}
 	let client = await pool.connect()
 
-	const listKeys = Object.keys(db)
+	const listKeys = Object.keys(db).filter(e => e != 'online')
 	const query = `
 		INSERT
 		INTO ${table}(${
@@ -89,7 +89,7 @@ const update = async (db, table='bots') => {
 	let data = {}
 	let client = await pool.connect()
 
-	const listKeys = Object.keys(db)
+	const listKeys = Object.keys(db).filter(e => e != 'online' && e != 'uptime')
 	const query = `
 		UPDATE ${table}
 			SET
@@ -97,7 +97,7 @@ const update = async (db, table='bots') => {
 					listKeys.reduce((total, e, index) => {
 						return `${total},
 						${e} = $${index+2}`
-					}, 'time = now()')
+					}, 'uptime = now()')
 				}
 			WHERE id = $1
 		RETURNING *;

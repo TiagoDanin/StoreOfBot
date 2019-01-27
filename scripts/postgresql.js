@@ -19,6 +19,7 @@ const main = async () => {
 			types            INT[]      DEFAULT '{}',
 			categories       INT[]      DEFAULT '{}',
 			scores           JSONB      DEFAULT '{}',
+			uptime           TIMESTAMP  DEFAULT now(),
 			time             TIMESTAMP  DEFAULT now(),
 			PRIMARY KEY (id)
 		);
