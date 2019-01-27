@@ -177,6 +177,6 @@ module.exports = {
 	plugin: base,
 	regex: [
 		/^\/(cat)egories\s(\d*)$/i,
-		/^\/start/i
+		/^\/list/i
 	]
 }
