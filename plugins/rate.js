@@ -1,5 +1,4 @@
 const base = async (ctx) => {
-	console.log(ctx.match)
 	let username = ctx.match[1]
 	if (ctx.updateType == 'callback_query') {
 		username = ctx.session.rate
@@ -36,7 +35,6 @@ const base = async (ctx) => {
 		}
 		ctx.answerCbQuery('Done!', true)
 	}
-	console.log(bot)
 
 	let text = `
 ${bot.name} (@${bot.username})

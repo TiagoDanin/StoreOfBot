@@ -13,7 +13,10 @@ const base = async (ctx) => {
 	]
 
 	if (ctx.match[2] == 'singup') {
-		text = '<b>Forward a message</b> from your bot in my private!'
+		text = `
+<b>Forward a message</b> from your bot in my private!
+🚫 No pornography or illegal material!
+		`
 	} else if (ctx.match[2] == 'about') {
 		text = `
 👤 <b>Developer:</b> @TiagoEDGE (Tiago Danin)

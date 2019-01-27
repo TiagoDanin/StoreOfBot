@@ -87,7 +87,6 @@ ${types[ctx.session.singup.type]}
 		}
 		if (type == 'token') {
 			const bot = await testToken(input)
-			console.log(bot)
 			if (!bot || bot.id != ctx.session.singup.db.id) {
 				return ctx.replyWithHTML(`
 <b>Token invalid!</b>
@@ -221,7 +220,7 @@ module.exports = {
 	forward: start,
 	plugin: info,
 	regex: [
-		/^\/singup/i
-		///^\/start ([\w\d]*bot)$/i
+		/^\/singup/i,
+		/^\/add/i
 	]
 }
