@@ -2,10 +2,11 @@ module.exports = {
 	plugins: [
 		'backup',
 		'list',
-		//'menu',
+		'menu',
 		'ping',
 		//'rate',
-		'singup'
+		'singup',
+		'stats'
 	],
 	types: ['programming'],
 	categories: ['game', 'test', 'ffdsfsd', 'fdfd43', 'fsd'],
