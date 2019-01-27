@@ -92,6 +92,8 @@ const base = async (ctx) => {
 		ctx.session.list.page--
 	} else if (ctx.match[2] == 'next') {
 		ctx.session.list.page++
+	} else if (ctx.match[2] == 'home') {
+		ctx.session.list.page = 0
 	}
 	if (ctx.session.list.page < 0) {
 		ctx.session.list.page = 0
@@ -120,6 +122,7 @@ ${bot.description}
 	let keyboard = [
 		[
 			{text: '◀️ Back' , callback_data: 'list:back'},
+			{text: '🔼 Home' , callback_data: 'list:home'},
 			{text: '▶️ Next' , callback_data: 'list:next'}
 		],
 		[
