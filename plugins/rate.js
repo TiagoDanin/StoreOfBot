@@ -31,6 +31,7 @@ const base = async (ctx) => {
 			bot.scores[ctx.from.id] = score
 			const scores = Object.keys(bot.scores)
 			bot.score = scores.map(e => bot.scores[e]).reduce((a, b) => Math.floor(a) + Math.floor(b)) / scores.length
+			bot.score = bot.score.toFixed(1)
 			await ctx.database.update(bot)
 		}
 		ctx.answerCbQuery('Done!', true)
