@@ -172,7 +172,7 @@ ${types[ctx.session.singup.type]}
 		} else {
 			await ctx.database.insert(ctx.session.singup.db)
 		}
-		await ctx.replyWithMarkdown(`
+		await ctx.reply(`
 Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}
 		`)
 		text += `Done!`
