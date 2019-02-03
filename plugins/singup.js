@@ -1,7 +1,10 @@
 const Telegraf = require('telegraf')
 
 const clean = (string) => {
-	return string.replace(/[<>\[\]\(\)\*#@]/g, '')
+	if (typeof string == 'string') {
+		return string.replace(/[<>\[\]\(\)\*#@]/g, '')
+	}
+	return string
 }
 
 const types = {
