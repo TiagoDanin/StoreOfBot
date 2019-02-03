@@ -30,7 +30,7 @@ const base = async (ctx) => {
 		if (score >= 1 && score <= 5) { //Anti-hack
 			bot.scores[ctx.from.id] = score
 			const scores = Object.keys(bot.scores)
-			bot.score = scores.map(e => bot.scores[e]).reduce((a, b) => a + b) / scores.length
+			bot.score = scores.map(e => bot.scores[e]).reduce((a, b) => Math.floor(a) + Math.floor(b)) / scores.length
 			await ctx.database.update(bot)
 		}
 		ctx.answerCbQuery('Done!', true)
