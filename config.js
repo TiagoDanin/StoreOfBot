@@ -35,7 +35,15 @@ module.exports = {
 	],
 	languages: [
 		'English',
-		'Português'
+		'Português',
+		'Français',
+		'Español',
+		'Italiano',
+		'русский',
+		'日本語',
+		'中國', //Ch-tr
+		'العربية', //Arabic
+		'فارسی' //Persian
 	],
 	defaultLang: 'en',
 	locales: [],
