@@ -98,14 +98,35 @@ const base = async (ctx) => {
 	if (ctx.session.list.page < 0) {
 		ctx.session.list.page = 0
 	}
+	if (ctx.match[2] == 'search') {
+		if (ctx.match[3]) {
+			ctx.session.search = false
+		} else {
+			ctx.session.search = true
+			return ctx.replyWithHTML('<b>Name of bot?</b>', {
+				reply_markup: {
+					force_reply: true
+				}
+			})
+		}
+	}
 
-	let bots = await ctx.database.selectWithFilter(
-		toIndex(ctx, 'categories'),
-		toIndex(ctx, 'types'),
-		toIndex(ctx, 'languages'),
-		ctx.session.list.page,
-		orders.find(e => e.id == ctx.session.list.order).query
-	)
+	if (typeof ctx.session.search == 'boolean' && ctx.session.search) {
+		ctx.session.search = ctx.match[1] || ''
+	}
+
+	let bots = []
+	if (typeof ctx.session.search == 'string') {
+		bots = await ctx.database.search(ctx.session.search)
+	} else {
+		bots = await ctx.database.selectWithFilter(
+			toIndex(ctx, 'categories'),
+			toIndex(ctx, 'types'),
+			toIndex(ctx, 'languages'),
+			ctx.session.list.page,
+			orders.find(e => e.id == ctx.session.list.order).query
+		)
+	}
 
 	let text = bots.reduce((total, bot, index) => {
 		let view = `
@@ -139,7 +160,7 @@ ${bot.description}
 			{text: `⚖️ Advanced Filter`, callback_data: 'list:types'}
 		],
 		[
-			{text: '🔎 Search', callback_data: 'search'}
+			{text: '🔎 Search', callback_data: 'list:search'}
 		],
 		[
 			{text: '📜 Menu' , callback_data: 'menu'}
@@ -169,6 +190,10 @@ ${bot.description}
 		keyboard = showOptions(ctx, 'types')
 	}
 
+	if (ctx.session.search) {
+		keyboard.push([{text: '❌ Close Search' , callback_data: 'list:search:end'}])
+	}
+
 	if (ctx.updateType == 'callback_query') {
 		return ctx.editMessageText(text + ctx.fixKeyboard, {
 			parse_mode: 'HTML',
@@ -190,6 +215,7 @@ module.exports = {
 	id: 'list',
 	callback: base,
 	plugin: base,
+	reply: base,
 	regex: [
 		/^\/(cat)egories\s(\d*)$/i,
 		/^\/list/i

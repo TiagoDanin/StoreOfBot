@@ -161,10 +161,23 @@ const selectWithFilter = async (
 	return data.rows
 }
 
+const search = async (name, table='bots') => {
+	let data = {}
+	let client = await pool.connect()
+	data = await client.query(`
+		SELECT *, EXTRACT(EPOCH FROM ( now() - time ) ) < 86400 AS online
+		FROM ${table}
+		WHERE name @@ $1;
+	`, [name]).catch(error)
+	client.release()
+	return data.rows
+}
+
 module.exports = {
 	select,
 	selectWithFilter,
 	del,
 	insert,
-	update
+	update,
+	search
 }
