@@ -58,6 +58,12 @@ const change = (ctx, type) => {
 }
 
 const showOptions = (ctx, type) => {
+	if (ctx.session.list.categories.length <= 0) {
+		ctx.session.list.categories = ctx.config.categories
+	}
+	if (ctx.session.list.types.length <= 0) {
+		ctx.session.list.types = ctx.config.types
+	}
 	const keys = ctx.config[type].map((el) => {
 		return [{
 			text: `${
