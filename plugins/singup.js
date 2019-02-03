@@ -1,5 +1,9 @@
 const Telegraf = require('telegraf')
 
+const clean = (string) => {
+	return string.replace(/[<>\[\]\(\)\*#@]/g, '')
+}
+
 const types = {
 	//'name': 'Name (Example Bot):',
 	//'username': 'Username (examplebot):',
@@ -105,7 +109,7 @@ ${types[ctx.session.singup.type]}
 				})
 			}
 		} else {
-			ctx.session.singup.db[type] = input
+			ctx.session.singup.db[type] = clean(input)
 		}
 
 		const keyTypes = Object.keys(types)
@@ -198,7 +202,7 @@ const start = async (ctx) => {
 		update: false,
 		db: {
 			id: ctx.forward.id,
-			name: ctx.forward.first_name,
+			name: clean(ctx.forward.first_name),
 			username: ctx.forward.username,
 			description: '', //TODO Use mtproto
 			admin: ctx.from.id,
