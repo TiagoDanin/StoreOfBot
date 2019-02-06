@@ -2,10 +2,10 @@ const base = async (ctx) => {
 	const all = await ctx.database.select()
 	const users = await ctx.database.select({}, 'users')
 	const text = `
-<b>Total Users:</b> ${users.length}
-<b>New Users:</b> ${(users.filter((e) => e.online)).length}
 <b>Total Bots:</b> ${all.length}
-<b>New Bots:</b> ${(all.filter((e) => e.online)).length}
+<b>Total Users:</b> ${users.length}
+<b>New Bots (24h):</b> ${(all.filter((e) => e.online)).length}
+<b>New Users (24h):</b> ${(users.filter((e) => e.online)).length}
 `
 
 	return ctx.editMessageText(text + ctx.fixKeyboard, {

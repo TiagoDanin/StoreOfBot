@@ -115,7 +115,7 @@ const base = async (ctx) => {
 		} else {
 			ctx.session.list.page = 0
 			ctx.session.search = true
-			return ctx.replyWithHTML('<b>Name of bot?</b>', {
+			return ctx.replyWithHTML('<b>Name: (reply msg)</b>', {
 				reply_markup: {
 					force_reply: true
 				}

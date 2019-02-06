@@ -10,8 +10,8 @@ const clean = (string) => {
 const types = {
 	//'name': 'Name (Example Bot):',
 	//'username': 'Username (examplebot):',
-	'token': 'Send the bot token to confirm:', //TODO MSG UPDATE
-	'description': 'Description:',
+	'token': 'Send the bot token to confirm: (reply msg)', //TODO MSG UPDATE
+	'description': 'Description: (reply msg)',
 	'categories': 'Categories (Max 3):',
 	'languages': 'Languages:',
 	'types': 'Types:'
