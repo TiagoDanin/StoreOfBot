@@ -2,13 +2,12 @@ const base = async (ctx) => {
 	let text = 'Welcome!'
 	let keyboard = [
 		[
-			{text: '🤖 Bots' , callback_data: 'list'}
+			{text: '🤖 Bots' , callback_data: 'list'},
+			{text: '🗣 Channels (Soon™)' , callback_data: 'list'}
 		],
 		[
-			{text: '📝 My List', callback_data: 'mylist'}
-		],
-		[
-			{text: '❇️ Add/Edit You Bot', callback_data: 'menu:singup'}
+			{text: '📝 My List', callback_data: 'mylist'},
+			{text: '❇️ Add & Edit', callback_data: 'menu:singup'}
 		],
 		[
 			{text: '⚙️ Settings', callback_data: 'config'},

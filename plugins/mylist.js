@@ -6,7 +6,7 @@ const base = async (ctx) => {
 
 	const bots = await ctx.database.select({admin: ctx.from.id})
 	if (bots.length <= 0) {
-		text += '\nNot found!'
+		text += '\nEmpty!'
 	}
 
 	if (ctx.match[2]) {

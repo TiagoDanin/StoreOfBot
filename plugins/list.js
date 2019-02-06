@@ -140,6 +140,10 @@ const base = async (ctx) => {
 		)
 	}
 
+	let notBots = 'No results found!'
+	if (ctx.session.list.page > 0) {
+		notBots += ' (Go back to home page)'
+	}
 	let text = bots.reduce((total, bot, index) => {
 		let view = `
 ${index+1 + (ctx.session.list.page * 3)}. ${link(ctx, bot.username, bot.name)} - ⭐️(${link(ctx, bot.username, bot.score)}) | 👥(${link(ctx, bot.username, Object.keys(bot.scores).length)}) | (${link(ctx, `report-${bot.id}`, 'Report')})
@@ -150,7 +154,7 @@ ${bot.description}
 			return view
 		}
 		return total + view
-	}, 'Without Bots!')
+	}, notBots)
 
 	let keyboard = [
 		[
