@@ -46,6 +46,7 @@ const toIndex = (ctx, type) => {
 
 const change = (ctx, type) => {
 	const key = ctx.match[3]
+	ctx.session.list.page = 0
 	if (ctx.session.list[type].length == ctx.config[type].length) {
 		ctx.session.list[type] = []
 	}
@@ -81,6 +82,7 @@ const showOptions = (ctx, type) => {
 }
 
 const base = async (ctx) => {
+	let edit = true
 	if (!ctx.session.list) {
 		ctx.session.list = {
 			page: 0,
@@ -96,9 +98,12 @@ const base = async (ctx) => {
 		ctx.session.list.order = ctx.match[3]
 	} else if (ctx.match[2] == 'back') {
 		ctx.session.list.page--
+		edit = false
 	} else if (ctx.match[2] == 'next') {
 		ctx.session.list.page++
+		edit = false
 	} else if (ctx.match[2] == 'home') {
+		edit = false
 		ctx.session.list.page = 0
 	}
 	if (ctx.session.list.page < 0) {
@@ -108,6 +113,7 @@ const base = async (ctx) => {
 		if (ctx.match[3]) {
 			ctx.session.search = false
 		} else {
+			ctx.session.list.page = 0
 			ctx.session.search = true
 			return ctx.replyWithHTML('<b>Name of bot?</b>', {
 				reply_markup: {
@@ -163,12 +169,8 @@ ${bot.description}
 			{text: `📈 Order (${orders.find(e => e.id == ctx.session.list.order).name})`, callback_data: 'list:order'}
 		],
 		[
-			{text: `⚖️ Advanced Filter`, callback_data: 'list:types'}
-		],
-		[
-			{text: '🔎 Search', callback_data: 'list:search'}
-		],
-		[
+			{text: `⚖️ Advanced Filter`, callback_data: 'list:types'},
+			{text: '🔎 Search', callback_data: 'list:search'},
 			{text: '📜 Menu' , callback_data: 'menu'}
 		]
 	]
@@ -200,7 +202,7 @@ ${bot.description}
 		keyboard.push([{text: '❌ Close Search' , callback_data: 'list:search:end'}])
 	}
 
-	if (ctx.updateType == 'callback_query') {
+	if (ctx.updateType == 'callback_query' && edit) {
 		return ctx.editMessageText(text + ctx.fixKeyboard, {
 			parse_mode: 'HTML',
 			reply_markup: {
