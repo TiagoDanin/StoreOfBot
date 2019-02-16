@@ -2,26 +2,35 @@ const base = async (ctx) => {
 	let text = 'Welcome!'
 	let keyboard = [
 		[
-			{text: '🤖 Bots' , callback_data: 'list'},
-			{text: '🗣 Channels (Soon™)' , callback_data: 'list'}
+			{text: '🤖 Bots' , callback_data: 'list:bots'},
+			{text: '🗣 Channels' , callback_data: 'list:channels'},
+			{text: '📝 My List', callback_data: 'mylist'}
 		],
 		[
-			{text: '📝 My List', callback_data: 'mylist'},
-			{text: '❇️ Add & Edit', callback_data: 'menu:singup'}
-		],
-		[
+			{text: '❇️ Add & Edit', callback_data: 'menu:singup'},
 			{text: '⚙️ Settings', callback_data: 'config'},
 			{text: '📔 About' , callback_data: 'menu:about'}
 		]
 	]
 
+	if (ctx.session.list) {
+		ctx.session.list.page = 0
+	}
+	if (ctx.session.search) {
+		ctx.session.search = false
+	}
+	if (ctx.session.singup) {
+		ctx.session.search = {}
+	}
+
 	if (ctx.match[2] == 'singup') {
 		text = `
-<b>Forward a message</b> from your bot in my private!
+<b>Forward a message</b> from your bot or channel in my private!
 🚫 No pornography or illegal material!
 		`
 	} else if (ctx.match[2] == 'about') {
 		text = `
+Search, Explore & Discover the best bots.
 👤 <b>Developer:</b> @TiagoEDGE (Tiago Danin)
 		`
 		keyboard = [

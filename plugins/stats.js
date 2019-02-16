@@ -1,10 +1,14 @@
 const base = async (ctx) => {
-	const all = await ctx.database.select()
+	const bots = await ctx.database.select()
 	const users = await ctx.database.select({}, 'users')
+	const channels = await ctx.database.select({}, 'channels')
 	const text = `
-<b>Total Bots:</b> ${all.length}
+<b>Total Bots:</b> ${bots.length}
 <b>Total Users:</b> ${users.length}
-<b>New Bots (24h):</b> ${(all.filter((e) => e.online)).length}
+<b>Total Channels:</b> ${users.length}
+
+<b>New Bots (24h):</b> ${(bots.filter((e) => e.online)).length}
+<b>New Channels (24h):</b> ${(channels.filter((e) => e.online)).length}
 <b>New Users (24h):</b> ${(users.filter((e) => e.online)).length}
 `
 

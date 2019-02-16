@@ -1,3 +1,8 @@
+const databases = {
+	bots: 'b',
+	channels: 'c'
+}
+
 const orders = [{
 	name: 'Name',
 	id: 'name',
@@ -65,7 +70,7 @@ const showOptions = (ctx, type) => {
 	if (ctx.session.list.types.length <= 0) {
 		ctx.session.list.types = ctx.config.types
 	}
-	const keys = ctx.config[type].map((el) => {
+	let keys = ctx.config[type].map((el) => {
 		return [{
 			text: `${
 				status(ctx.session.list[type].includes(el))
@@ -75,6 +80,13 @@ const showOptions = (ctx, type) => {
 			callback_data: `list:${type}:${el}`
 		}]
 	})
+	keys = keys.reduce((total, next, index) => {
+		if (total[total.length - 1].length >= 3) {
+			total.push([])
+		}
+		total[total.length - 1].push(next[0])
+		return total
+	}, [[]])
 	return [
 		[{ text: '📝 List', callback_data: 'list' }],
 		...keys
@@ -87,12 +99,19 @@ const base = async (ctx) => {
 		ctx.session.list = {
 			page: 0,
 			order: 'new',
+			database: 'bots',
 			categories: ctx.config.categories,
-			types: [ctx.config.types[0]]
+			types: ctx.config.types,
 		}
 	}
 
-	if (ctx.match[1] == 'cat' && ctx.match[2]) {
+	if (ctx.match[2] == 'bots') {
+		ctx.session.list.database = 'bots'
+		ctx.session.list.types = ctx.config.types
+	} else if (ctx.match[2] == 'channels') {
+		ctx.session.list.database = 'channels'
+		ctx.session.list.types = [ctx.config.types[0]]
+	} else if (ctx.match[1] == 'cat' && ctx.match[2]) {
 		ctx.session.list.categories = [ctx.config.categories[Number(ctx.match[2])]]
 	} else if (ctx.match[2] == 'order' && ctx.match[3]) {
 		ctx.session.list.order = ctx.match[3]
@@ -127,26 +146,27 @@ const base = async (ctx) => {
 		ctx.session.search = ctx.match[1] || ''
 	}
 
-	let bots = []
+	let db = []
 	if (typeof ctx.session.search == 'string') {
-		bots = await ctx.database.search(ctx.session.search)
+		db = await ctx.database.search(ctx.session.search, ctx.session.list.database)
 	} else {
-		bots = await ctx.database.selectWithFilter(
+		db = await ctx.database.selectWithFilter(
 			toIndex(ctx, 'categories'),
 			toIndex(ctx, 'types'),
 			toIndex(ctx, 'languages'),
 			ctx.session.list.page,
-			orders.find(e => e.id == ctx.session.list.order).query
+			orders.find(e => e.id == ctx.session.list.order).query,
+			ctx.session.list.database
 		)
 	}
 
-	let notBots = 'No results found!'
+	let nodb = 'No results found!'
 	if (ctx.session.list.page > 0) {
-		notBots += ' (Go back to home page)'
+		nodb += ' (Go back to home page)'
 	}
-	let text = bots.reduce((total, bot, index) => {
+	let text = db.reduce((total, bot, index) => {
 		let view = `
-${index+1 + (ctx.session.list.page * 3)}. ${link(ctx, bot.username, bot.name)} - ⭐️(${link(ctx, bot.username, bot.score)}) | 👥(${link(ctx, bot.username, Object.keys(bot.scores).length)}) | (${link(ctx, `report-${bot.id}`, 'Report')})
+${index+1 + (ctx.session.list.page * 3)}. ${link(ctx, bot.username, bot.name)} - ⭐️(${link(ctx, bot.username, bot.score)}) | 👥(${link(ctx, bot.username, Object.keys(bot.scores).length)}) | (${link(ctx, `report-${databases[ctx.session.list.database]}${bot.id}`, 'Report')})
 @${bot.username} - ${showcategories(ctx, bot.categories).join(' | ')}
 ${bot.description}
 		`
@@ -154,7 +174,7 @@ ${bot.description}
 			return view
 		}
 		return total + view
-	}, notBots)
+	}, nodb)
 
 	let keyboard = [
 		[
@@ -195,25 +215,36 @@ ${bot.description}
 			}]
 		})
 	} else if (ctx.match[2] == 'types') {
-		text = select
-		if (ctx.match[3]) {
-			ctx = change(ctx, 'types')
+		if (ctx.session.database == 'channels') {
+			ctx.answerCbQuery('Only on Bots!', true)
+		} else {
+			text = select
+			if (ctx.match[3]) {
+				ctx = change(ctx, 'types')
+			}
+			keyboard = showOptions(ctx, 'types')
 		}
-		keyboard = showOptions(ctx, 'types')
 	}
 
 	if (ctx.session.search) {
 		keyboard.push([{text: '❌ Close Search' , callback_data: 'list:search:end'}])
 	}
 
-	if (ctx.updateType == 'callback_query' && edit) {
-		return ctx.editMessageText(text + ctx.fixKeyboard, {
-			parse_mode: 'HTML',
-			reply_markup: {
-				inline_keyboard: keyboard
-			},
-			disable_web_page_preview: true
-		})
+	if (ctx.updateType == 'callback_query') {
+		if (edit) {
+			return ctx.editMessageText(text + ctx.fixKeyboard, {
+				parse_mode: 'HTML',
+				reply_markup: {
+					inline_keyboard: keyboard
+				},
+				disable_web_page_preview: true
+			})
+		} else {
+			ctx.editMessageText(ctx.update.callback_query.message.text, {
+				parse_mode: 'HTML',
+				disable_web_page_preview: true
+			})
+		}
 	}
 	return ctx.replyWithHTML(text + ctx.fixKeyboard, {
 		reply_markup: {
@@ -223,11 +254,17 @@ ${bot.description}
 	})
 }
 
+const baseWithReply = async (ctx) => {
+	if (ctx.session.search) {
+		return await base(ctx)
+	}
+}
+
 module.exports = {
 	id: 'list',
 	callback: base,
 	plugin: base,
-	reply: base,
+	reply: baseWithReply,
 	regex: [
 		/^\/(cat)egories\s(\d*)$/i,
 		/^\/list/i
