@@ -20,7 +20,7 @@ const base = async (ctx) => {
 		ctx.session.search = false
 	}
 	if (ctx.session.singup) {
-		ctx.session.search = {}
+		ctx.session.singup = {}
 	}
 
 	if (ctx.match[2] == 'singup') {
@@ -30,7 +30,7 @@ const base = async (ctx) => {
 		`
 	} else if (ctx.match[2] == 'about') {
 		text = `
-Search, Explore & Discover the best bots.
+Search, Explore & Discover the best bots or channel.
 👤 <b>Developer:</b> @TiagoEDGE (Tiago Danin)
 		`
 		keyboard = [

@@ -5,7 +5,13 @@ const base = async (ctx) => {
 	} else {
 		ctx.session.rate = username
 	}
-	let db = await ctx.database.select({username: username})
+
+	const bots = await ctx.database.select({username: username})
+	const channels = await ctx.database.select({username: username}, 'channels')
+	let db = [
+		...bots,
+		...channels
+	]
 	let keyboard = [
 		[
 			{text: '⭐️ 1' , callback_data: 'rate:1'},
@@ -22,7 +28,7 @@ const base = async (ctx) => {
 	if (db.length <= 0) {
 		return
 	} else {
-		db =db[0]
+		db = db[0]
 	}
 
 	if (ctx.match[2]) {
