@@ -5,24 +5,39 @@ const base = async (ctx) => {
 	]
 
 	const bots = await ctx.database.select({admin: ctx.from.id})
-	if (bots.length <= 0) {
+	const channels = await ctx.database.select({admin: ctx.from.id})
+
+	const dbs = [
+		...bots,
+		...channels
+	]
+
+	if (dbs.length <= 0) {
 		text += '\nEmpty!'
 	}
 
 	if (ctx.match[2]) {
-		let bot = bots.find(b => b.id == ctx.match[2])
+		let db = dbs.find(b => b.id == ctx.match[2])
 		text += `
-Username: ${bot.username}
-Link: https://telegram.me/${ctx.options.username}?start=${bot.username}
+Username: ${db.username}
+Link: https://telegram.me/${ctx.options.username}?start=${db.username}
 		`
 	}
 
-	bots.forEach((bot) => {
+	dbs.forEach((db) => {
 		keyboard.push([{
-			text: `🔗 ${bot.username}`,
-			callback_data: `mylist:${bot.id}`
+			text: `🔗 ${db.username}`,
+			callback_data: `mylist:${db.id}`
 		}])
 	})
+
+	keyboard = keyboard.reduce((total, next, index) => {
+		if (total[total.length - 1].length >= 3) {
+			total.push([])
+		}
+		total[total.length - 1].push(next[0])
+		return total
+	}, [[]])
 
 	if (ctx.updateType == 'callback_query') {
 		return ctx.editMessageText(text + ctx.fixKeyboard, {
