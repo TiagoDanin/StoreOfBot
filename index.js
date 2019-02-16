@@ -158,7 +158,7 @@ bot.use((ctx, next) => {
 
 bot.context.database = database
 bot.context.config = config
-bot.context.fixKeyboard = Array(90).join('\u0020') + '\u200B'
+bot.context.fixKeyboard = ''//Array(90).join('\u0020') + '\u200B'
 
 bot.use((ctx, next) => {
 	ctx.privilege = 0
@@ -239,10 +239,10 @@ bot.on('message', async (ctx) => {
 				processError(e, ctx, _)
 			}
 		}
-	} else if (msg.forward_from) {
+	} else if (msg.forward_from || msg.forward_from_chat) {
 		for (var _ of forward) {
 			dLogForward(`Runnig Forward plugin: ${_.id}`)
-			ctx.forward = msg.forward_from
+			ctx.forward = msg.forward_from || msg.forward_from_chat
 			try {
 				await _.forward(ctx)
 			} catch (e) {

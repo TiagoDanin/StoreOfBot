@@ -25,12 +25,19 @@ const testToken = async (token) => {
 const status = (key) => key ? '✅' : '❌'
 
 const keyboard = (list, db) => {
-	const keys = list.map((el) => {
+	let keys = list.map((el) => {
 		return [{
 			text: `${status(db[el])} ${el.replace(/^./, el[0].toUpperCase())}`,
 			callback_data: `singup:${el}`
 		}]
 	})
+	keys = keys.reduce((total, next, index) => {
+		if (total[total.length - 1].length >= 3) {
+			total.push([])
+		}
+		total[total.length - 1].push(next[0])
+		return total
+	}, [[]])
 	return [
 		[{ text: '👍 Next', callback_data: 'singup:next' }],
 		...keys
@@ -118,6 +125,9 @@ ${types[ctx.session.singup.type]}
 		const keyTypes = Object.keys(types)
 		const nextType = keyTypes.indexOf(type) + 1
 		ctx.session.singup.type = nextType >= keyTypes.length ? 'end' : keyTypes[nextType]
+		if (ctx.session.singup.database == 'channels' && ctx.session.singup.type == 'types') {
+			ctx.session.singup.type = 'end'
+		}
 		type = ctx.session.singup.type
 	}
 
@@ -153,13 +163,16 @@ ${types[ctx.session.singup.type]}
 		ctx.config.languages,
 		ctx.session.singup.db.languages
 	).map(e => ctx.config.languages[e]).join(', ')
-}
-<b>Types:</b> ${
-	getValues(
-		ctx.config.types,
-		ctx.session.singup.db.types
-	).map(e => ctx.config.types[e]).join(', ')
-}\n\n`
+}`
+	if (ctx.session.singup.database != 'channels') {
+		text += `<b>Types:</b> ${
+			getValues(
+				ctx.config.types,
+				ctx.session.singup.db.types
+			).map(e => ctx.config.types[e]).join(', ')
+		}`
+	}
+	text += '\n\n'
 
 	if (type == 'end') {
 		reply_markup = {
@@ -168,9 +181,9 @@ ${types[ctx.session.singup.type]}
 			]]
 		}
 		if (ctx.session.singup.update) {
-			await ctx.database.update(ctx.session.singup.db)
+			await ctx.database.update(ctx.session.singup.db, ctx.session.singup.database)
 		} else {
-			await ctx.database.insert(ctx.session.singup.db)
+			await ctx.database.insert(ctx.session.singup.db, ctx.session.singup.database)
 		}
 		await ctx.reply(`
 Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}
@@ -196,16 +209,26 @@ Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singu
 }
 
 const start = async (ctx) => {
+	let channel = false
 	if (!ctx.forward.is_bot) {
-		return ctx.replyWithMarkdown('This not is an bot!')
+		if (ctx.forward.type && ctx.forward.type == 'channel') {
+			channel = true
+		} else {
+			return ctx.replyWithMarkdown('This not is an bot or channel!')
+		}
+	}
+
+	if (ctx.session.search) {
+		ctx.session.search = false
 	}
 
 	ctx.session.singup = {
 		type: 'description',
+		database: 'bots',
 		update: false,
 		db: {
-			id: ctx.forward.id,
-			name: clean(ctx.forward.first_name),
+			id: Math.abs(ctx.forward.id),
+			name: clean(ctx.forward.first_name) || clean(ctx.forward.title),
 			username: ctx.forward.username,
 			description: '', //TODO Use mtproto
 			admin: ctx.from.id,
@@ -215,10 +238,21 @@ const start = async (ctx) => {
 		}
 	}
 
-	let bots = await ctx.database.select({id: ctx.forward.id})
-	if (bots.length != 0) {
-		if (bots[0].admin != ctx.from.id) {
-			ctx.session.singup.type = 'token'
+	if (channel) {
+		ctx.session.singup.database = 'channels'
+		ctx.session.singup.db.types = [0]
+	}
+
+	let db = await ctx.database.select({id: Math.abs(ctx.forward.id)}, ctx.session.singup.database)
+	if (db.length != 0) {
+		if (db[0].admin != ctx.from.id) {
+			if (ctx.privilege >= 6) {
+				ctx.session.singup.admin = db[0].admin
+			} else if (channel && ctx.update.message && ctx.update.message.text && !ctx.update.message.text.match(`CheckID:${Math.abs(ctx.forward.id)}`)) {
+				return ctx.replyWithMarkdown(`*Forward a message* from your channel in my private, with text \`CheckID:${Math.abs(ctx.forward.id)}\``)
+			} else if (!channel) {
+				ctx.session.singup.type = 'token'
+			}
 		}
 		ctx.session.singup.update = true
 	}
@@ -238,7 +272,7 @@ const start = async (ctx) => {
 }
 
 const info = (ctx) => {
-	return ctx.replyWithMarkdown('*Forward a message* from your bot in my private!')
+	return ctx.replyWithMarkdown('*Forward a message* from your bot ou channel in my private!')
 }
 
 module.exports = {
