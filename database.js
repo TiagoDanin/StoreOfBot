@@ -152,7 +152,7 @@ const selectWithFilter = async (
 	data = await client.query(`
 		SELECT *
 		FROM ${table}
-		WHERE categories && $1 AND types && $2 AND languages && $4
+		WHERE offline IS NOT TRUE AND categories && $1 AND types && $2 AND languages && $4
 		ORDER BY ${order}
 		LIMIT 3
 		OFFSET $3;
@@ -167,10 +167,32 @@ const search = async (name, table='bots') => {
 	data = await client.query(`
 		SELECT *, EXTRACT(EPOCH FROM ( now() - time ) ) < 86400 AS online
 		FROM ${table}
-		WHERE name @@ $1;
+		WHERE offline IS NOT TRUE AND name @@ $1;
 	`, [name]).catch(error)
 	client.release()
 	return data.rows
+}
+
+const offline = async (where={}, table='bots') => {
+	let data = {}
+	let client = await pool.connect()
+	data = await client.query(
+		`
+			UPDATE ${table}
+			SET offline = 't'
+			${
+				Object.keys(where).reduce((t, e, i) => {
+					if (i == 0) {
+						return `WHERE ${e} = $1`
+					}
+					return `${t} AND ${e} = $${i+1}`
+				}, '')
+			};
+		`,
+		Object.keys(where).map(e => where[e])
+	).catch(error)
+	client.release()
+	return data
 }
 
 module.exports = {
@@ -179,5 +201,6 @@ module.exports = {
 	del,
 	insert,
 	update,
-	search
+	search,
+	offline
 }
