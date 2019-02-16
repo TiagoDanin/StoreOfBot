@@ -8,10 +8,8 @@ const base = async (ctx) => {
 
 	const bots = await ctx.database.select({username: username})
 	const channels = await ctx.database.select({username: username}, 'channels')
-	let db = [
-		...bots,
-		...channels
-	]
+	let db = bots
+	let database = 'bots'
 	let keyboard = [
 		[
 			{text: '⭐️ 1' , callback_data: 'rate:1'},
@@ -26,7 +24,12 @@ const base = async (ctx) => {
 	]
 
 	if (db.length <= 0) {
-		return
+		db = channels
+		database = 'channels'
+		if (db.length <= 0) {
+			return
+		}
+		db = db[0]
 	} else {
 		db = db[0]
 	}
@@ -35,11 +38,11 @@ const base = async (ctx) => {
 		const score = ctx.match[2]
 		if (score >= 1 && score <= 5) { //Anti-hack
 			db.scores[ctx.from.id] = score
-			db.online = false
+			db.offline = false
 			const scores = Object.keys(db.scores)
 			db.score = scores.map(e => db.scores[e]).reduce((a, b) => Math.floor(a) + Math.floor(b)) / scores.length
 			db.score = db.score.toFixed(1)
-			await ctx.database.update(db)
+			await ctx.database.update(db, database)
 		}
 		ctx.answerCbQuery('Done!', true)
 	}
