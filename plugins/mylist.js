@@ -5,7 +5,7 @@ const base = async (ctx) => {
 	]
 
 	const bots = await ctx.database.select({admin: ctx.from.id})
-	const channels = await ctx.database.select({admin: ctx.from.id})
+	const channels = await ctx.database.select({admin: ctx.from.id}, 'channels')
 
 	const dbs = [
 		...bots,
