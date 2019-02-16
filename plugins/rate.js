@@ -5,7 +5,7 @@ const base = async (ctx) => {
 	} else {
 		ctx.session.rate = username
 	}
-	let bot = await ctx.database.select({username: username})
+	let db = await ctx.database.select({username: username})
 	let keyboard = [
 		[
 			{text: '⭐️ 1' , callback_data: 'rate:1'},
@@ -19,28 +19,29 @@ const base = async (ctx) => {
 		]
 	]
 
-	if (bot.length <= 0) {
+	if (db.length <= 0) {
 		return
 	} else {
-		bot = bot[0]
+		db =db[0]
 	}
 
 	if (ctx.match[2]) {
 		const score = ctx.match[2]
 		if (score >= 1 && score <= 5) { //Anti-hack
-			bot.scores[ctx.from.id] = score
-			const scores = Object.keys(bot.scores)
-			bot.score = scores.map(e => bot.scores[e]).reduce((a, b) => Math.floor(a) + Math.floor(b)) / scores.length
-			bot.score = bot.score.toFixed(1)
-			await ctx.database.update(bot)
+			db.scores[ctx.from.id] = score
+			db.online = false
+			const scores = Object.keys(db.scores)
+			db.score = scores.map(e => db.scores[e]).reduce((a, b) => Math.floor(a) + Math.floor(b)) / scores.length
+			db.score = db.score.toFixed(1)
+			await ctx.database.update(db)
 		}
 		ctx.answerCbQuery('Done!', true)
 	}
 
 	let text = `
-${bot.name} (@${bot.username})
-⭐️(${bot.score}) | 👥(${Object.keys(bot.scores).length})
-${bot.description}
+${db.name} (@${db.username})
+⭐️(${db.score}) | 👥(${Object.keys(db.scores).length})
+${db.description}
 	`
 
 	if (ctx.updateType == 'callback_query') {
@@ -63,6 +64,6 @@ module.exports = {
 	plugin: base,
 	callback: base,
 	regex: [
-		/^\/([\w\d_-]*bot)$/i,
+		/^\/([\w\d_-]*)$/i,
 	]
 }
