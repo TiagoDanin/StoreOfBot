@@ -6,6 +6,11 @@
   version "10.11.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.11.7.tgz#0e75ca9357d646ca754016ca1d68a127ad7e7300"
 
+argv@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/argv/-/argv-0.0.2.tgz#ecbd16f8949b157183711b1bda334f37840185ab"
+  integrity sha1-7L0W+JSbFXGDcRsb2jNPN4QBhas=
+
 bindings@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.2.1.tgz#14ad6113812d2d37d72e67b4cacb4bb726505f11"
@@ -43,11 +48,18 @@ encoding@^0.1.12:
   dependencies:
     iconv-lite "~0.4.13"
 
-gettext-parser@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/gettext-parser/-/gettext-parser-2.0.0.tgz#c28bb31e61f76f14665dfafbb5c0518cdc1270ed"
+esprima@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
+  integrity sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==
+
+gettext-parser@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/gettext-parser/-/gettext-parser-3.1.0.tgz#a92f4aa09cdaa944ce71832677749d84ac683649"
+  integrity sha512-eVD8RxFMeHg8pjl5zsk7xlEDaKdcYlotLztiMaYGLvI13LMXwWlybLg7rg6eagct79vyGkPGZrMPBsdjsQOnWg==
   dependencies:
     encoding "^0.1.12"
+    readable-stream "^3.0.6"
     safe-buffer "^5.1.2"
 
 iconv-lite@~0.4.13:
@@ -56,7 +68,7 @@ iconv-lite@~0.4.13:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-inherits@~2.0.1:
+inherits@^2.0.3, inherits@~2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
@@ -103,12 +115,15 @@ node-fetch@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.2.0.tgz#4ee79bde909262f9775f731e3656d0db55ced5b5"
 
-nodejs-i18n@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/nodejs-i18n/-/nodejs-i18n-1.0.1.tgz#a0e84097e22b3fd732fd3c3a36959bb03da18304"
+nodejs-i18n@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/nodejs-i18n/-/nodejs-i18n-2.1.0.tgz#77de55ba1db9bb25f251dbaf931ceba32ddb0595"
+  integrity sha512-aJF7eMf4D2wHE/QwtYdE5hOfOxebKqWBHopOzASgykv+cHvZ6/MuY9rySedneYufdx06N4RILtpd4dvUdsu3Dw==
   dependencies:
-    gettext-parser "^2.0.0"
-    tempy "^0.2.1"
+    argv "0.0.2"
+    esprima "4.0.1"
+    gettext-parser "3.1.0"
+    tempy "0.2.1"
 
 packet-reader@0.3.1:
   version "0.3.1"
@@ -218,7 +233,16 @@ readable-stream@1.0.31:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
-safe-buffer@^5.1.2:
+readable-stream@^3.0.6:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.2.0.tgz#de17f229864c120a9f56945756e4f32c4045245d"
+  integrity sha512-RV20kLjdmpZuTF1INEb9IA3L68Nmi+Ri7ppZqo78wj//Pn62fCoJyV9zalccNzDD/OuJpMG4f+pfMl8+L6QdGw==
+  dependencies:
+    inherits "^2.0.3"
+    string_decoder "^1.1.1"
+    util-deprecate "^1.0.1"
+
+safe-buffer@^5.1.2, safe-buffer@~5.1.0:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
 
@@ -241,6 +265,13 @@ split@^1.0.0:
   integrity sha512-mTyOoPbrivtXnwnIxZRFYRrPNtEFKlpB2fvjSnCQUiAA6qAZzqwna5envK4uk6OIeP17CsdF3rSBGYVBsU0Tkg==
   dependencies:
     through "2"
+
+string_decoder@^1.1.1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.2.0.tgz#fe86e738b19544afe70469243b2a1ee9240eae8d"
+  integrity sha512-6YqyX6ZWEYguAxgZzHGL7SsCeGx3V2TtOTqZz1xSTSWnqsbWwbptafNyvf/ACquZUXV3DANr5BDIwNYe1mN42w==
+  dependencies:
+    safe-buffer "~5.1.0"
 
 string_decoder@~0.10.x:
   version "0.10.31"
@@ -270,9 +301,10 @@ temp-dir@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/temp-dir/-/temp-dir-1.0.0.tgz#0a7c0ea26d3a39afa7e0ebea9c1fc0bc4daa011d"
 
-tempy@^0.2.1:
+tempy@0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tempy/-/tempy-0.2.1.tgz#9038e4dbd1c201b74472214179bc2c6f7776e54c"
+  integrity sha512-LB83o9bfZGrntdqPuRdanIVCPReam9SOZKW0fOy5I9X3A854GGWi0tjCqoXEk84XIEYBc/x9Hq3EFop/H5wJaw==
   dependencies:
     temp-dir "^1.0.0"
     unique-string "^1.0.0"
@@ -287,6 +319,11 @@ unique-string@^1.0.0:
   resolved "https://registry.yarnpkg.com/unique-string/-/unique-string-1.0.0.tgz#9e1057cca851abb93398f8b33ae187b99caec11a"
   dependencies:
     crypto-random-string "^1.0.0"
+
+util-deprecate@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
+  integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
 xtend@^4.0.0:
   version "4.0.1"
