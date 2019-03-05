@@ -8,6 +8,7 @@ const pool = new Pool({
 const users = JSON.parse(fs.readFileSync('./Users.backup.JSON').toString())
 const bots = JSON.parse(fs.readFileSync('./Bots.backup.JSON').toString())
 const channels = JSON.parse(fs.readFileSync('./Channels.backup.JSON').toString())
+const groups = JSON.parse(fs.readFileSync('./Groups.backup.JSON').toString())
 
 const log = (text) => console.log('>>', text)
 
@@ -43,3 +44,4 @@ const insert = async (db, table) => {
 users.forEach((db) => insert(db, 'users'))
 bots.forEach((db) => insert(db, 'bots'))
 channels.forEach((db) => insert(db, 'channels'))
+groups.forEach((db) => insert(db, 'groups'))
