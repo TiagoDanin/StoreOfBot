@@ -61,6 +61,6 @@ module.exports = {
 	plugin: base,
 	callback: base,
 	regex: [
-		/^\/me/i
+		/^\/me$/i
 	]
 }
