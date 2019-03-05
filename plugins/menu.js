@@ -2,14 +2,17 @@ const base = async (ctx) => {
 	let text = 'Welcome!'
 	let keyboard = [
 		[
-			{text: '🤖 Bots' , callback_data: 'list:bots'},
-			{text: '🗣 Channels' , callback_data: 'list:channels'},
-			{text: '📝 My List', callback_data: 'mylist'}
+			{text: '🤖 Bots', callback_data: 'list:bots'},
+			{text: '🗣 Channels', callback_data: 'list:channels'},
+			{text: '👥 Groups', callback_data: 'list:groups'}
 		],
 		[
+			{text: '📝 My List', callback_data: 'mylist'},
 			{text: '❇️ Add & Edit', callback_data: 'menu:singup'},
-			{text: '⚙️ Settings', callback_data: 'config'},
 			{text: '📔 About' , callback_data: 'menu:about'}
+		],
+		[
+			{text: '⚙️ Settings', callback_data: 'config'}
 		]
 	]
 
@@ -25,7 +28,11 @@ const base = async (ctx) => {
 
 	if (ctx.match[2] == 'singup') {
 		text = `
+• Channel or Bot
 <b>Forward a message</b> from your bot or channel in my private!
+• Group
+<b>Add this bot</b> to a group with username enabled! (free to remove)
+
 🚫 No pornography or illegal material!
 		`
 	} else if (ctx.match[2] == 'about') {
@@ -34,8 +41,10 @@ Search, Explore & Discover the best bots or channel.
 👤 <b>Developer:</b> @TiagoEDGE (Tiago Danin)
 		`
 		keyboard = [
-			[{text: '📜 Menu' , callback_data: 'menu:main' }],
-			[{text: '📊 Stats' , callback_data: 'stats' }],
+			[
+				{text: '📜 Menu' , callback_data: 'menu:main' },
+				{text: '📊 Stats' , callback_data: 'stats' }
+			],
 			[{
 				text: 'Twitter @_TiagoEDGE',
 				url: 'twitter.com/_tiagoedge'

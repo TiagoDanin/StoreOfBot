@@ -111,6 +111,9 @@ const base = async (ctx) => {
 	} else if (ctx.match[2] == 'channels') {
 		ctx.session.list.database = 'channels'
 		ctx.session.list.types = [ctx.config.types[0]]
+	} else if (ctx.match[2] == 'groups') {
+		ctx.session.list.database = 'groups'
+		ctx.session.list.types = [ctx.config.types[0]]
 	} else if (ctx.match[1] == 'cat' && ctx.match[2]) {
 		ctx.session.list.categories = [ctx.config.categories[Number(ctx.match[2])]]
 	} else if (ctx.match[2] == 'order' && ctx.match[3]) {

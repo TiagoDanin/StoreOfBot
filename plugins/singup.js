@@ -128,6 +128,9 @@ ${types[ctx.session.singup.type]}
 		if (ctx.session.singup.database == 'channels' && ctx.session.singup.type == 'types') {
 			ctx.session.singup.type = 'end'
 		}
+		if (ctx.session.singup.database == 'groups' && ctx.session.singup.type == 'types') {
+			ctx.session.singup.type = 'end'
+		}
 		type = ctx.session.singup.type
 	}
 
@@ -272,7 +275,14 @@ const start = async (ctx) => {
 }
 
 const info = (ctx) => {
-	return ctx.replyWithMarkdown('*Forward a message* from your bot ou channel in my private!')
+	return ctx.replyWithHTML(`
+• Channel or Bot
+<b>Forward a message</b> from your bot or channel in my private!
+• Group
+<b>Add this bot</b> to a group with username enabled! (free to remove)
+
+🚫 No pornography or illegal material!
+	`)
 }
 
 module.exports = {

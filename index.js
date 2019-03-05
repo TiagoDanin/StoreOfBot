@@ -224,6 +224,54 @@ config.plugins.forEach(p => {
 	}
 })
 
+bot.on('new_chat_members', async (ctx) => {
+	let msg = ctx.message
+
+	if (ctx.session.search) {
+		ctx.session.search = false
+	}
+
+	if (msg.new_chat_participant.id == 165770307 && msg.chat.username) {
+		ctx.session.singup = {
+			type: 'description',
+			database: 'groups',
+			update: false,
+			db: {
+				id: Math.abs(msg.chat.id),
+				name: msg.chat.title.replace(/[<>\[\]\(\)\*#@]/g, ''),
+				username: msg.chat.username,
+				description: '',
+				admin: msg.from.id,
+				languages: {},
+				categories: {},
+				types: [0]
+			}
+		}
+
+		let db = await ctx.database.select({
+			id: Math.abs(msg.chat.id)
+		}, ctx.session.singup.database)
+		if (db.length != 0) {
+			ctx.session.singup.update = true
+		}
+
+		ctx.config.categories.forEach((el) => {
+			ctx.session.singup.db.categories[el] = false
+		})
+		ctx.config.types.forEach((el) => {
+			ctx.session.singup.db.types[el] = false
+		})
+
+		ctx.replyWithMarkdown('*I have sent you the requested information in a private message.*')
+		return bot.telegram.sendMessage(msg.from.id, '*Description: (reply msg)*', {
+			parse_mode: 'Markdown',
+			reply_markup: {
+				force_reply: true
+			}
+		})
+	}
+})
+
 bot.on('message', async (ctx) => {
 	var msg = ctx.message
 	if (msg.reply_to_message && msg.reply_to_message.text && msg.text) {
