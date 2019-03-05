@@ -166,9 +166,10 @@ const base = async (ctx) => {
 	}
 	let text = db.reduce((total, bot, index) => {
 		let view = `
-${index+1 + (ctx.session.list.page * 3)}. ${link(ctx, bot.username, bot.name)} - ⭐️(${link(ctx, bot.username, bot.score)}) | 👥(${link(ctx, bot.username, Object.keys(bot.scores).length)}) | (${link(ctx, `report-${databases[ctx.session.list.database]}${bot.id}`, 'Report')})
-@${bot.username} - ${showcategories(ctx, bot.categories).join(' | ')}
-${bot.description}
+${index+1 + (ctx.session.list.page * 3)}. ${bot.name} (${link(ctx, bot.username, 'view')})
+⭐️ ${bot.score} | 👥 ${Object.keys(bot.scores).length} | (${link(ctx, `report-${databases[ctx.session.list.database]}${bot.id}`, 'Report')})
+🔖 ${showcategories(ctx, bot.categories).join(' | ')}
+@${bot.username} -  ${bot.description}
 		`
 		if (index == 0) {
 			return view
