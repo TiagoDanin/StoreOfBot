@@ -6,10 +6,12 @@ const base = async (ctx) => {
 
 	const bots = await ctx.database.select({admin: ctx.from.id})
 	const channels = await ctx.database.select({admin: ctx.from.id}, 'channels')
+	const groups = await ctx.database.select({admin: ctx.from.id}, 'groups')
 
 	const dbs = [
 		...bots,
-		...channels
+		...channels,
+		...groups
 	]
 
 	if (dbs.length <= 0) {
