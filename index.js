@@ -231,7 +231,7 @@ bot.on('new_chat_members', async (ctx) => {
 		ctx.session.search = false
 	}
 
-	if (msg.new_chat_participant.id == 165770307 && msg.chat.username) {
+	if (msg.new_chat_participant.id == 620082476 && msg.chat.username) {
 		ctx.session.singup = {
 			type: 'description',
 			database: 'groups',
