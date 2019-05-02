@@ -34,7 +34,7 @@
     "debug": "4.1.1",
     "json-stringify-safe": "5.0.1",
     "moment-timezone": "0.5.25",
-    "nodejs-i18n": "2.1.0",
+    "nodejs-i18n": "2.3.0",
     "pg": "7.10.0",
     "pg-native": "3.0.0",
     "telegraf": "3.29.0",
