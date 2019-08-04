@@ -3584,7 +3584,7 @@ xo-init@^0.7.0:
     the-argv "^1.0.0"
     write-pkg "^3.1.0"
 
-xo@^0.24.0:
+xo@0.24.0:
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/xo/-/xo-0.24.0.tgz#f931ff453f3440919d51da908591371e8ed714e0"
   integrity sha512-eaXWpNtXHbJ+DSiDkdRnDcMYPeUi/MWFUoUgorBhzAueTCM+v4o9Xv6buYgyoL4r7JuTp5EWXx3lGn9Md4dgWA==
