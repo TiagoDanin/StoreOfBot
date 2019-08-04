@@ -28,14 +28,14 @@ yarn test
 
 ## Dependencies
 
-- [debug](https://ghub.io/debug): 
-- [json-stringify-safe](https://ghub.io/json-stringify-safe): 
-- [moment-timezone](https://ghub.io/moment-timezone): 
-- [nodejs-i18n](https://ghub.io/nodejs-i18n): 
-- [pg](https://ghub.io/pg): 
-- [pg-native](https://ghub.io/pg-native): 
-- [telegraf](https://ghub.io/telegraf): 
-- [telegraf-start-parts](https://ghub.io/telegraf-start-parts): 
+- [debug](https://ghub.io/debug): small debugging utility
+- [json-stringify-safe](https://ghub.io/json-stringify-safe): Like JSON.stringify, but doesn&#x27;t blow up on circular refs.
+- [moment-timezone](https://ghub.io/moment-timezone): Parse and display moments in any timezone.
+- [nodejs-i18n](https://ghub.io/nodejs-i18n): Minimalistic internationalization using gettext style for NodeJS
+- [pg](https://ghub.io/pg): PostgreSQL client - pure javascript &amp; libpq with the same API
+- [pg-native](https://ghub.io/pg-native): A slightly nicer interface to Postgres over node-libpq
+- [telegraf](https://ghub.io/telegraf): 📡 Modern Telegram Bot Framework
+- [telegraf-start-parts](https://ghub.io/telegraf-start-parts): Command /start parameters parser middleware for Telegraf
 
 ## Dev Dependencies
 
