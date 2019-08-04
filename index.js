@@ -2,7 +2,7 @@ const Telegraf = require('telegraf')
 const telegrafStart = require('telegraf-start-parts')
 const debug = require('debug')
 const stringify = require('json-stringify-safe')
-const { Resources, Translation } = require('nodejs-i18n')
+const {Resources, Translation} = require('nodejs-i18n')
 const session = require('telegraf/session')
 
 const config = require('./config')
@@ -15,12 +15,11 @@ const dlogBot = debug('bot')
 const dlogPlugins = debug('bot:plugins')
 const dlogReply = debug('bot:reply')
 const dLogForward = debug('bot:forward')
-const dlogInline = debug('bot:inline')
 const dlogCallback = debug('bot:callback')
 const dlogError = debug('bot:error')
 
-dlogBot("Start bot")
-let startLog = `
+dlogBot('Start bot')
+const startLog = `
 #Start
 <b>BOT START</b>
 <b>Username:</b> @StoreOfBot
@@ -34,33 +33,36 @@ bot.telegram.sendMessage(config.ids.log,
 const processError = (error, ctx, plugin) => {
 	if (error) {
 		if (`${error}`.match('400: Bad Request: message is not modified')) {
-			return ctx.answerCbQuery('You have already selected is option!', true).catch((e) => {
-				return dlogError(e)
+			return ctx.answerCbQuery('You have already selected is option!', true).catch(error2 => {
+				return dlogError(error2)
 			})
-		} else if (`${error}`.match('Error: 403: Forbidden: bot was blocked by the user')) {
-			return true //TODO FIx
+		}
+
+		if (`${error}`.match('Error: 403: Forbidden: bot was blocked by the user')) {
+			return true // TODO FIx
 		}
 	}
 
-	var fulllog = []
-	var logId = `${+ new Date()}_`
+	const fulllog = []
+	let logId = `${Number(new Date())}_`
 	if (ctx && ctx.update && ctx.update.update_id) {
 		logId += `${ctx.update.update_id}`
 	} else {
 		logId += 'NoUpdate'
 	}
 
-	var errorMsg = 'ERROR'
+	let errorMsg = 'ERROR'
 	if (ctx && ctx._) {
 		errorMsg = ctx._('ERROR')
 	}
+
 	errorMsg += ` \`ID:${logId}\``
 
 	if (ctx && ctx.updateType) {
 		if (ctx.updateType == 'message') {
 			ctx.replyWithMarkdown(errorMsg)
 		} else if (ctx.updateType == 'callback_query' || ctx.updateType == 'edited_message') {
-			ctx.reply(errorMsg, { //editMessageText
+			ctx.reply(errorMsg, { // EditMessageText
 				parse_mode: 'Markdown'
 			})
 		} else if (ctx.updateType == '') {
@@ -76,14 +78,16 @@ const processError = (error, ctx, plugin) => {
 			type: 'error',
 			data: error
 		})
-		dlogError(`Oooops`, error)
+		dlogError('Oooops', error)
 	}
+
 	if (ctx) {
 		fulllog.push({
 			type: 'ctx',
 			data: ctx
 		})
 	}
+
 	if (plugin) {
 		fulllog.push({
 			type: 'plugin',
@@ -91,32 +95,35 @@ const processError = (error, ctx, plugin) => {
 		})
 	}
 
-	var clearUser = (user) => JSON.stringify(user).replace(/[{"}]/g, '').replace(/,/g, '\n').replace(/:/g, ': ')
+	const clearUser = user => JSON.stringify(user).replace(/[{"}]/g, '').replace(/,/g, '\n').replace(/:/g, ': ')
 
-	var text = `#Error ID:${logId}`
+	let text = `#Error ID:${logId}`
 	if (plugin && plugin.id) {
 		text += `\nPlugin ~> ${plugin.id}`
 	}
+
 	if (error) {
 		text += `\nERROR ~>\n${error.toString()}\n`
 	}
+
 	if (ctx && ctx.from) {
 		text += `\nFROM ~>\n${clearUser(ctx.from)}\n`
 	}
+
 	if (ctx && ctx.chat) {
 		text += `\nCHAT ~>\n${clearUser(ctx.chat)}`
 	}
 
 	bot.telegram.sendMessage(config.ids.log, text.substring(0, 4000))
 
-	var jsonData = stringify(fulllog)
-	var remove = (name) => {
+	let jsonData = stringify(fulllog)
+	const remove = name => {
 		jsonData = jsonData.replace(new RegExp(name, 'gi'), 'OPS_SECRET')
 	}
 
 	[
 		process.env.telegram_token
-		//add more...
+		// Add more...
 	].forEach(name => remove(name))
 
 	return bot.telegram.sendDocument(
@@ -128,14 +135,14 @@ const processError = (error, ctx, plugin) => {
 	)
 }
 
-let inline = []
-let callback = []
-let reply = []
-let forward = []
+const inline = []
+const callback = []
+const reply = []
+const forward = []
 
 bot.use((ctx, next) => telegrafStart(ctx, next))
 bot.use(session({
-	getSessionKey: (ctx) => {
+	getSessionKey: ctx => {
 		return ctx.from.id
 	}
 }))
@@ -143,11 +150,11 @@ bot.use(session({
 const r = new Resources({
 	lang: config.defaultLang
 })
-config.locales.forEach((id) => {
+config.locales.forEach(id => {
 	r.load(id, `locales/${id}.po`)
 })
 
-const checkLanguage = (ctx) => {
+const checkLanguage = ctx => {
 	let language = config.defaultLang
 	const types = [
 		'message',
@@ -155,19 +162,21 @@ const checkLanguage = (ctx) => {
 		'callback_query',
 		'inline_query'
 	]
-	let type = types.find((t) => ctx.update[t])
+	const type = types.find(t => ctx.update[t])
 	if (type && ctx.update[type] && ctx.update[type].from && ctx.update[type].from.language_code) {
 		language = ctx.update[type].from.language_code.substr(0, 2)
 	}
-	if (!locales.includes(language)) {
+
+	if (!config.locales.includes(language)) {
 		language = config.defaultLang
 	}
+
 	return language
 }
 
 bot.use((ctx, next) => {
-	var langCode = checkLanguage(ctx)
-	var i18n = new Translation(langCode)
+	const langCode = checkLanguage(ctx)
+	const i18n = new Translation(langCode)
 	ctx._ = i18n._.bind(i18n)
 	ctx.langCode = langCode
 	return next(ctx)
@@ -175,7 +184,7 @@ bot.use((ctx, next) => {
 
 bot.context.database = database
 bot.context.config = config
-bot.context.fixKeyboard = ''//Array(90).join('\u0020') + '\u200B'
+bot.context.fixKeyboard = ''// Array(90).join('\u0020') + '\u200B'
 
 bot.use((ctx, next) => {
 	ctx.privilege = 0
@@ -184,6 +193,7 @@ bot.use((ctx, next) => {
 	} else if (config.ids.mods.includes(ctx.from.id)) {
 		ctx.privilege = 5
 	}
+
 	return next(ctx)
 })
 
@@ -198,28 +208,29 @@ bot.use(async (ctx, next) => {
 	} else {
 		ctx.db = ctx.db[0]
 	}
+
 	return next(ctx)
 })
 
 config.plugins.forEach(p => {
-	var _ = require(`./plugins/${p}`)
+	const _ = require(`./plugins/${p}`)
 	dlogBot(`Install plugin: ${_.id}`)
 
 	if (_.install) {
 		try {
 			_.install()
-		} catch (e) {
-			processError(e, false, _)
+		} catch (error) {
+			processError(error, false, _)
 		}
 	}
 
 	if (_.plugin) {
-		bot.hears(_.regex, async (ctx) => {
+		bot.hears(_.regex, async ctx => {
 			dlogPlugins(`Runnig cmd plugin: ${_.id}`)
 			try {
 				await _.plugin(ctx)
-			} catch (e) {
-				processError(e, ctx, _)
+			} catch (error) {
+				processError(error, ctx, _)
 			}
 		})
 	}
@@ -241,8 +252,8 @@ config.plugins.forEach(p => {
 	}
 })
 
-bot.on('new_chat_members', async (ctx) => {
-	let msg = ctx.message
+bot.on('new_chat_members', async ctx => {
+	const msg = ctx.message
 
 	if (ctx.session.search) {
 		ctx.session.search = false
@@ -265,17 +276,17 @@ bot.on('new_chat_members', async (ctx) => {
 			}
 		}
 
-		let db = await ctx.database.select({
+		const db = await ctx.database.select({
 			id: Math.abs(msg.chat.id)
 		}, ctx.session.singup.database)
 		if (db.length != 0) {
 			ctx.session.singup.update = true
 		}
 
-		ctx.config.categories.forEach((el) => {
+		ctx.config.categories.forEach(el => {
 			ctx.session.singup.db.categories[el] = false
 		})
-		ctx.config.types.forEach((el) => {
+		ctx.config.types.forEach(el => {
 			ctx.session.singup.db.types[el] = false
 		})
 
@@ -289,10 +300,10 @@ bot.on('new_chat_members', async (ctx) => {
 	}
 })
 
-bot.on('message', async (ctx) => {
-	var msg = ctx.message
+bot.on('message', async ctx => {
+	const msg = ctx.message
 	if (msg.reply_to_message && msg.reply_to_message.text && msg.text) {
-		for (var _ of reply) {
+		for (const _ of reply) {
 			dlogReply(`Runnig Reply plugin: ${_.id}`)
 			ctx.match = [
 				msg.reply_to_message.text,
@@ -300,41 +311,41 @@ bot.on('message', async (ctx) => {
 			]
 			try {
 				await _.reply(ctx)
-			} catch (e) {
-				processError(e, ctx, _)
+			} catch (error) {
+				processError(error, ctx, _)
 			}
 		}
 	} else if (msg.forward_from || msg.forward_from_chat) {
-		for (var _ of forward) {
+		for (const _ of forward) {
 			dLogForward(`Runnig Forward plugin: ${_.id}`)
 			ctx.forward = msg.forward_from || msg.forward_from_chat
 			try {
 				await _.forward(ctx)
-			} catch (e) {
-				processError(e, ctx, _)
+			} catch (error) {
+				processError(error, ctx, _)
 			}
 		}
 	}
 })
 
-bot.on('callback_query', async (ctx) => {
+bot.on('callback_query', async ctx => {
 	if (ctx.update && ctx.update.callback_query && ctx.update.callback_query.data) {
-		var data = ctx.update.callback_query.data
-		for (var _ of callback) {
+		const {data} = ctx.update.callback_query
+		for (const _ of callback) {
 			if (data.startsWith(_.id)) {
 				ctx.match = [].concat(data, data.split(':'))
 				dlogCallback(`Runnig callback plugin: ${_.id}`)
 				try {
 					await _.callback(ctx)
-				} catch (e) {
-					processError(e, ctx, _)
+				} catch (error) {
+					processError(error, ctx, _)
 				}
 			}
 		}
 	}
 })
 
-bot.catch((err) => {
+bot.catch(err => {
 	try {
 		processError(err, false, false)
 	} catch (e) {

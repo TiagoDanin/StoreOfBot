@@ -1,43 +1,82 @@
 {
-  "name": "storeofbot",
-  "main": "index.js",
-  "version": "1.1.0",
-  "description": "Telegram bot",
-  "author": {
-    "name": "Tiago Danin",
-    "email": "TiagoDanin@outlook.com",
-    "url": "https://TiagoDanin.github.io"
-  },
-  "license": "MIT",
-  "keywords": [
-    "bot",
-    "telegram",
-    "telegraf"
-  ],
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Nice Test :)\""
-  },
-  "private": true,
-  "repository": "https://github.com/TiagoDanin/Defend-The-Castle.git",
-  "homepage": "https://TiagoDanin.github.io/Defend-The-Castle",
-  "bugs": "https://github.com/TiagoDanin/Defend-The-Castle/issues",
-  "github": {
-    "name": "Defend-The-Castle",
-    "owner": "TiagoDanin"
-  },
-  "files": [
-    "LICENSE",
-    "README.md"
-  ],
-  "dependencies": {
-    "debug": "4.1.1",
-    "json-stringify-safe": "5.0.1",
-    "moment-timezone": "0.5.25",
-    "nodejs-i18n": "2.3.0",
-    "pg": "7.10.0",
-    "pg-native": "3.0.0",
-    "telegraf": "3.29.0",
-    "telegraf-start-parts": "1.0.0"
-  }
+	"name": "storeofbot",
+	"main": "index.js",
+	"preferGlobal": false,
+	"version": "1.1.0",
+	"description": "Source code of bot StoreOfBot on Telegram",
+	"author": {
+		"email": "TiagoDanin@outlook.com",
+		"name": "Tiago Danin",
+		"url": "https://TiagoDanin.github.io"
+	},
+	"license": "MIT",
+	"keywords": [
+		"bots",
+		"store",
+		"telegraf",
+		"telegraf-bots",
+		"telegram",
+		"telegram-bot"
+	],
+	"scripts": {
+		"start": "env-cmd node index.js",
+		"dev": "env-cmd nodemon rs",
+		"test": "xo",
+		"i18n": "ls | grep .js | sort | npx nodejs-i18n --value | msgmerge --backup=off --update locales/pt.po /dev/stdin"
+	},
+	"engines": {
+		"node": ">=9.9.0"
+	},
+	"private": false,
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TiagoDanin/StoreOfBot.git"
+	},
+	"homepage": "https://TiagoDanin.github.io/Defend-The-Castle",
+	"bugs": {
+		"url": "https://github.com/TiagoDanin/StoreOfBot/issues"
+	},
+	"github": {
+		"name": "StoreOfBot",
+		"owner": "TiagoDanin"
+	},
+	"files": [
+		"LICENSE",
+		"README.md",
+		"config.js",
+		"database.js",
+		"index.js",
+		"locales",
+		"package.json",
+		"plugins"
+	],
+	"dependencies": {
+		"debug": "^4.1.1",
+		"json-stringify-safe": "5.0.1",
+		"moment-timezone": "0.5.25",
+		"nodejs-i18n": "2.3.0",
+		"pg": "^7.10.0",
+		"pg-native": "^3.0.0",
+		"telegraf": "^3.29.0",
+		"telegraf-start-parts": "^1.0.0"
+	},
+	"devDependencies": {
+		"env-cmd": "9.0.3",
+		"nodemon": "1.19.0",
+		"xo": "^0.24.0"
+	},
+	"xo": {
+		"rules": {
+			"quote-props": "warn",
+			"eqeqeq": "warn",
+			"array-callback-return": "warn",
+			"require-atomic-updates": "warn",
+			"no-else-return": "off",
+			"camelcase": "off",
+			"no-useless-escape": "warn",
+			"block-scoped-var": "off",
+			"no-await-in-loop": "off"
+		},
+		"semicolon": false
+	}
 }

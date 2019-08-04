@@ -1,4 +1,4 @@
-const base = async (ctx) => {
+const base = async ctx => {
 	let username = ctx.match[1]
 	if (ctx.updateType == 'callback_query') {
 		username = ctx.session.rate
@@ -6,41 +6,41 @@ const base = async (ctx) => {
 		ctx.session.rate = username
 	}
 
-	const bots = await ctx.database.select({username: username})
-	const channels = await ctx.database.select({username: username}, 'channels')
-	const groups = await ctx.database.select({username: username}, 'groups')
+	const bots = await ctx.database.select({username})
+	const channels = await ctx.database.select({username}, 'channels')
+	const groups = await ctx.database.select({username}, 'groups')
 	let db = [
-		...bots.map((e) => {
+		...bots.map(e => {
 			e.database = 'bots'
 			return e
 		}),
-		...channels.map((e) => {
+		...channels.map(e => {
 			e.database = 'channels'
 			return e
 		}),
-		...groups.map((e) => {
+		...groups.map(e => {
 			e.database = 'groups'
 			return e
 		})
 	]
 	db = db[0]
-	let database = db.database
-	let keyboard = [
+	const {database} = db
+	const keyboard = [
 		[
-			{text: '⭐️ 1' , callback_data: 'rate:1'},
-			{text: '⭐️ 2' , callback_data: 'rate:2'},
-			{text: '⭐️ 3' , callback_data: 'rate:3'},
-			{text: '⭐️ 4' , callback_data: 'rate:4'},
-			{text: '⭐️ 5' , callback_data: 'rate:5'}
+			{text: '⭐️ 1', callback_data: 'rate:1'},
+			{text: '⭐️ 2', callback_data: 'rate:2'},
+			{text: '⭐️ 3', callback_data: 'rate:3'},
+			{text: '⭐️ 4', callback_data: 'rate:4'},
+			{text: '⭐️ 5', callback_data: 'rate:5'}
 		],
 		[
-			{text: '📜 Menu' , callback_data: 'menu:main' }
+			{text: '📜 Menu', callback_data: 'menu:main'}
 		]
 	]
 
 	if (ctx.match[2]) {
 		const score = ctx.match[2]
-		if (score >= 1 && score <= 5) { //Anti-hack
+		if (score >= 1 && score <= 5) { // Anti-hack
 			db.scores[ctx.from.id] = score
 			db.offline = false
 			const scores = Object.keys(db.scores)
@@ -54,10 +54,11 @@ const base = async (ctx) => {
 				offline: db.offline
 			}, database)
 		}
+
 		ctx.answerCbQuery('Done!', true)
 	}
 
-	let text = `
+	const text = `
 ${db.name} (@${db.username})
 ⭐️(${db.score}) | 👥(${Object.keys(db.scores).length})
 ${db.description}
@@ -71,6 +72,7 @@ ${db.description}
 			}
 		})
 	}
+
 	return ctx.replyWithHTML(text + ctx.fixKeyboard, {
 		reply_markup: {
 			inline_keyboard: keyboard
@@ -83,6 +85,6 @@ module.exports = {
 	plugin: base,
 	callback: base,
 	regex: [
-		/^\/([\w\d_-]*)$/i,
+		/^\/([\w\d_-]*)$/i
 	]
 }

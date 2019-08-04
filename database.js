@@ -3,25 +3,24 @@ const pg = require('pg').native
 
 const dlogError = debug('bot:error')
 const dlogPgQuery = debug('bot:database:query')
-const dlogPgValues= debug('bot:database:values')
+const dlogPgValues = debug('bot:database:values')
 
-const Query = pg.Query
-const submit = Query.prototype.submit
-Query.prototype.submit = function() {
-	const text = this.text
-	const values = this.values
+const {Query} = pg
+const {submit} = Query.prototype
+Query.prototype.submit = function () {
+	const {text} = this
+	const {values} = this
 	const query = values.reduce((q, v, i) => q.replace(`$${i + 1}`, v), text)
 	dlogPgValues(values)
 	dlogPgQuery(query)
-	submit.apply(this, arguments)
+	submit.apply(this, arguments) // eslint-disable-line prefer-rest-params
 }
 
-const { Pool } = pg
 const pool = new pg.Pool({
 	database: 'storeofbot'
 })
 
-const error = (res) => {
+const error = res => {
 	dlogError(res)
 	return {
 		rowCount: 0,
@@ -30,54 +29,57 @@ const error = (res) => {
 	}
 }
 
-const insert = async (db, table='bots') => {
+const insert = async (db, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 
 	const listKeys = Object.keys(db).filter(e => e != 'online')
 	const query = `
 		INSERT
 		INTO ${table}(${
-			listKeys.join(', ')
-		})
+	listKeys.join(', ')
+})
 		VALUES (${
-			listKeys.reduce((t, e, i) => {
-				if (i == 0) {
-					return '$1'
-				}
-				return `${t}, $${i+1}`
-			}, '')
-		})
+	listKeys.reduce((t, e, i) => {
+		if (i == 0) {
+			return '$1'
+		}
+
+		return `${t}, $${i + 1}`
+	}, '')
+})
 		RETURNING *;
 	`
 
 	data = await client.query(
 		query,
-		listKeys.map((e) => db[e])
+		listKeys.map(e => db[e])
 	).catch(error)
 
 	client.release()
 	if (data.rowCount != 1) {
 		return false
 	}
+
 	return data.rows[0]
 }
 
-const select = async (where={}, table='bots') => {
+const select = async (where = {}, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 	data = await client.query(
 		`
 			SELECT *, EXTRACT(EPOCH FROM ( now() - time ) ) < 86400 AS online
 			FROM ${table}
 			${
-				Object.keys(where).reduce((t, e, i) => {
-					if (i == 0) {
-						return `WHERE ${e} = $1`
-					}
-					return `${t} AND ${e} = $${i+1}`
-				}, '')
-			};
+	Object.keys(where).reduce((t, e, i) => {
+		if (i == 0) {
+			return `WHERE ${e} = $1`
+		}
+
+		return `${t} AND ${e} = $${i + 1}`
+	}, '')
+};
 		`,
 		Object.keys(where).map(e => where[e])
 	).catch(error)
@@ -85,20 +87,20 @@ const select = async (where={}, table='bots') => {
 	return data.rows
 }
 
-const update = async (db, table='bots') => {
+const update = async (db, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 
 	const listKeys = Object.keys(db).filter(e => e != 'online' && e != 'uptime')
 	const query = `
 		UPDATE ${table}
 			SET
 				${
-					listKeys.reduce((total, e, index) => {
-						return `${total},
-						${e} = $${index+2}`
-					}, 'uptime = now()')
-				}
+	listKeys.reduce((total, e, index) => {
+		return `${total},
+						${e} = $${index + 2}`
+	}, 'uptime = now()')
+}
 			WHERE id = $1
 		RETURNING *;
 	`
@@ -114,24 +116,26 @@ const update = async (db, table='bots') => {
 	if (data.rowCount != 1) {
 		return false
 	}
+
 	return data.rows[0]
 }
 
-const del = async (where={}, table='bots') => {
+const del = async (where = {}, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 	data = await client.query(
 		`
 			DELETE
 			FROM ${table}
 			${
-				Object.keys(where).reduce((t, e, i) => {
-					if (i == 0) {
-						return `WHERE ${e} = $1`
-					}
-					return `${t} AND ${e} = $${i+1}`
-				}, '')
-			};
+	Object.keys(where).reduce((t, e, i) => {
+		if (i == 0) {
+			return `WHERE ${e} = $1`
+		}
+
+		return `${t} AND ${e} = $${i + 1}`
+	}, '')
+};
 		`,
 		Object.keys(where).map(e => where[e])
 	).catch(error)
@@ -140,15 +144,15 @@ const del = async (where={}, table='bots') => {
 }
 
 const selectWithFilter = async (
-	categories=[],
-	types=[],
-	languages=['English'],
-	page=0,
-	order='name',
-	table='bots'
+	categories = [],
+	types = [],
+	languages = ['English'],
+	page = 0,
+	order = 'name',
+	table = 'bots'
 ) => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 	data = await client.query(`
 		SELECT *
 		FROM ${table}
@@ -156,14 +160,14 @@ const selectWithFilter = async (
 		ORDER BY ${order}
 		LIMIT 3
 		OFFSET $3;
-	`, [categories, types, page*3, languages]).catch(error)
+	`, [categories, types, page * 3, languages]).catch(error)
 	client.release()
 	return data.rows
 }
 
-const search = async (name, table='bots') => {
+const search = async (name, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 	data = await client.query(`
 		SELECT *, EXTRACT(EPOCH FROM ( now() - time ) ) < 86400 AS online
 		FROM ${table}
@@ -173,21 +177,22 @@ const search = async (name, table='bots') => {
 	return data.rows
 }
 
-const offline = async (where={}, table='bots') => {
+const offline = async (where = {}, table = 'bots') => {
 	let data = {}
-	let client = await pool.connect()
+	const client = await pool.connect()
 	data = await client.query(
 		`
 			UPDATE ${table}
 			SET offline = 't'
 			${
-				Object.keys(where).reduce((t, e, i) => {
-					if (i == 0) {
-						return `WHERE ${e} = $1`
-					}
-					return `${t} AND ${e} = $${i+1}`
-				}, '')
-			};
+	Object.keys(where).reduce((t, e, i) => {
+		if (i == 0) {
+			return `WHERE ${e} = $1`
+		}
+
+		return `${t} AND ${e} = $${i + 1}`
+	}, '')
+};
 		`,
 		Object.keys(where).map(e => where[e])
 	).catch(error)

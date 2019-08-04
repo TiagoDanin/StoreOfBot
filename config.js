@@ -41,9 +41,9 @@ module.exports = {
 		'Italiano',
 		'русский',
 		'日本語',
-		'中國', //Ch-tr
-		'العربية', //Arabic
-		'فارسی' //Persian
+		'中國', // Ch-tr
+		'العربية', // Arabic
+		'فارسی' // Persian
 	],
 	defaultLang: 'en',
 	locales: [],

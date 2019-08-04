@@ -1,7 +1,7 @@
-const base = async (ctx) => {
+const base = async ctx => {
 	let text = '<b>Your list:</b>'
-	let keyboard  = [
-		[{text: '📜 Menu' , callback_data: 'menu:main'}],
+	let keyboard = [
+		[{text: '📜 Menu', callback_data: 'menu:main'}]
 	]
 
 	const bots = await ctx.database.select({admin: ctx.from.id})
@@ -19,24 +19,25 @@ const base = async (ctx) => {
 	}
 
 	if (ctx.match[2]) {
-		let db = dbs.find(b => b.id == ctx.match[2])
+		const db = dbs.find(b => b.id == ctx.match[2])
 		text += `
 Username: ${db.username}
 Link: https://telegram.me/${ctx.options.username}?start=${db.username}
 		`
 	}
 
-	dbs.forEach((db) => {
+	dbs.forEach(db => {
 		keyboard.push([{
 			text: `🔗 ${db.username}`,
 			callback_data: `mylist:${db.id}`
 		}])
 	})
 
-	keyboard = keyboard.reduce((total, next, index) => {
+	keyboard = keyboard.reduce((total, next) => {
 		if (total[total.length - 1].length >= 3) {
 			total.push([])
 		}
+
 		total[total.length - 1].push(next[0])
 		return total
 	}, [[]])
@@ -50,6 +51,7 @@ Link: https://telegram.me/${ctx.options.username}?start=${db.username}
 			disable_web_page_preview: true
 		})
 	}
+
 	return ctx.replyWithHTML(text + ctx.fixKeyboard, {
 		reply_markup: {
 			inline_keyboard: keyboard

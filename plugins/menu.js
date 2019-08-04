@@ -1,4 +1,4 @@
-const base = async (ctx) => {
+const base = async ctx => {
 	let text = 'Welcome!'
 	let keyboard = [
 		[
@@ -9,7 +9,7 @@ const base = async (ctx) => {
 		[
 			{text: '📝 My List', callback_data: 'mylist'},
 			{text: '❇️ Add & Edit', callback_data: 'menu:singup'},
-			{text: '📔 About' , callback_data: 'menu:about'}
+			{text: '📔 About', callback_data: 'menu:about'}
 		],
 		[
 			{text: '⚙️ Settings', callback_data: 'config'}
@@ -19,9 +19,11 @@ const base = async (ctx) => {
 	if (ctx.session.list) {
 		ctx.session.list.page = 0
 	}
+
 	if (ctx.session.search) {
 		ctx.session.search = false
 	}
+
 	if (ctx.session.singup) {
 		ctx.session.singup = {}
 	}
@@ -42,8 +44,8 @@ Search, Explore & Discover the best bots or channel.
 		`
 		keyboard = [
 			[
-				{text: '📜 Menu' , callback_data: 'menu:main' },
-				{text: '📊 Stats' , callback_data: 'stats' }
+				{text: '📜 Menu', callback_data: 'menu:main'},
+				{text: '📊 Stats', callback_data: 'stats'}
 			],
 			[{
 				text: 'Twitter @_TiagoEDGE',
@@ -64,6 +66,7 @@ Search, Explore & Discover the best bots or channel.
 			disable_web_page_preview: true
 		})
 	}
+
 	return ctx.replyWithHTML(text + ctx.fixKeyboard, {
 		reply_markup: {
 			inline_keyboard: keyboard

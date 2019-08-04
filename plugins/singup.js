@@ -1,45 +1,48 @@
 const Telegraf = require('telegraf')
 
-const clean = (string) => {
-	if (typeof string == 'string') {
+const clean = string => {
+	if (typeof string === 'string') {
 		return string.replace(/[<>\[\]\(\)\*#@]/g, '')
 	}
+
 	return string
 }
 
 const types = {
-	//'name': 'Name (Example Bot):',
-	//'username': 'Username (examplebot):',
-	'token': 'Send the bot token to confirm: (reply msg)', //TODO MSG UPDATE
-	'description': 'Description: (reply msg)',
-	'categories': 'Categories (Max 3):',
-	'languages': 'Languages:',
-	'types': 'Types:'
+	// 'name': 'Name (Example Bot):',
+	// 'username': 'Username (examplebot):',
+	token: 'Send the bot token to confirm: (reply msg)', // TODO MSG UPDATE
+	description: 'Description: (reply msg)',
+	categories: 'Categories (Max 3):',
+	languages: 'Languages:',
+	types: 'Types:'
 }
 
-const testToken = async (token) => {
+const testToken = async token => {
 	const bot = new Telegraf(token)
-	return await bot.telegram.getMe().catch(() => false)
+	const res = await bot.telegram.getMe().catch(() => false)
+	return res
 }
 
-const status = (key) => key ? '✅' : '❌'
+const status = key => key ? '✅' : '❌'
 
 const keyboard = (list, db) => {
-	let keys = list.map((el) => {
+	let keys = list.map(el => {
 		return [{
 			text: `${status(db[el])} ${el.replace(/^./, el[0].toUpperCase())}`,
 			callback_data: `singup:${el}`
 		}]
 	})
-	keys = keys.reduce((total, next, index) => {
+	keys = keys.reduce((total, next) => {
 		if (total[total.length - 1].length >= 3) {
 			total.push([])
 		}
+
 		total[total.length - 1].push(next[0])
 		return total
 	}, [[]])
 	return [
-		[{ text: '👍 Next', callback_data: 'singup:next' }],
+		[{text: '👍 Next', callback_data: 'singup:next'}],
 		...keys
 	]
 }
@@ -48,8 +51,9 @@ const getValues = (list, db) => {
 	if (Array.isArray(db)) {
 		return db
 	}
-	let values = []
-	Object.keys(db).forEach((el) => {
+
+	const values = []
+	Object.keys(db).forEach(el => {
 		if (db[el]) {
 			values.push(
 				list.indexOf(el)
@@ -59,13 +63,13 @@ const getValues = (list, db) => {
 	return values
 }
 
-const base = async (ctx) => {
+const base = async ctx => {
 	if (!ctx.session.singup || !ctx.session.singup.type) {
 		return
 	}
 
 	let input = ctx.match[1].replace(/@/g, '')
-	let type = ctx.session.singup.type
+	let {type} = ctx.session.singup
 	let reply_markup = {
 		force_reply: true
 	}
@@ -98,16 +102,18 @@ const base = async (ctx) => {
 				}
 			}
 		}
-		if (typeof input == 'string') {
+
+		if (typeof input === 'string') {
 			if (input.match(/[<>\[\]\(\)\*#@]/g || input.length < 12 || input.length > 160)) {
 				return ctx.replyWithHTML(`
 <b>Text must have only letter and number with 12-160 characters!</b>
 ${types[ctx.session.singup.type]}
 					`, {
-					reply_markup: reply_markup
+					reply_markup
 				})
 			}
 		}
+
 		if (type == 'token') {
 			const bot = await testToken(input)
 			if (!bot || bot.id != ctx.session.singup.db.id) {
@@ -115,7 +121,7 @@ ${types[ctx.session.singup.type]}
 <b>Token invalid!</b>
 ${types[ctx.session.singup.type]}
 					`, {
-					reply_markup: reply_markup
+					reply_markup
 				})
 			}
 		} else {
@@ -128,9 +134,11 @@ ${types[ctx.session.singup.type]}
 		if (ctx.session.singup.database == 'channels' && ctx.session.singup.type == 'types') {
 			ctx.session.singup.type = 'end'
 		}
+
 		if (ctx.session.singup.database == 'groups' && ctx.session.singup.type == 'types') {
 			ctx.session.singup.type = 'end'
 		}
+
 		type = ctx.session.singup.type
 	}
 
@@ -140,9 +148,10 @@ ${types[ctx.session.singup.type]}
 	}
 
 	if (showKeyboard) {
-		if (ctx.config[showKeyboard].includes(ctx.match[2])) { //Anti Hack
-			ctx.session.singup.db[showKeyboard][ctx.match[2]] = ctx.session.singup.db[showKeyboard][ctx.match[2]] ? false : true
+		if (ctx.config[showKeyboard].includes(ctx.match[2])) { // Anti Hack
+			ctx.session.singup.db[showKeyboard][ctx.match[2]] = !ctx.session.singup.db[showKeyboard][ctx.match[2]]
 		}
+
 		reply_markup = {
 			inline_keyboard: keyboard(
 				ctx.config[showKeyboard],
@@ -175,6 +184,7 @@ ${types[ctx.session.singup.type]}
 			).map(e => ctx.config.types[e]).join(', ')
 		}`
 	}
+
 	text += '\n\n'
 
 	if (type == 'end') {
@@ -188,30 +198,33 @@ ${types[ctx.session.singup.type]}
 		} else {
 			await ctx.database.insert(ctx.session.singup.db, ctx.session.singup.database)
 		}
+
 		await ctx.reply(`
 Your link: https://telegram.me/${ctx.options.username}?start=${ctx.session.singup.db.username}
 		`)
-		text += `Done!`
-		ctx.session.singup = {} //Reset
+		text += 'Done!'
+		ctx.session.singup = {} // Reset
 	} else {
 		text += `📌 <b>${types[ctx.session.singup.type]}</b>`
 	}
+
 	text += `${ctx.fixKeyboard}`
 
 	if (ctx.updateType == 'callback_query' && type != 'end') {
 		return ctx.editMessageText(text, {
 			parse_mode: 'HTML',
-			reply_markup: reply_markup,
+			reply_markup,
 			disable_web_page_preview: true
 		})
 	}
+
 	return ctx.replyWithHTML(text, {
-		reply_markup: reply_markup,
+		reply_markup,
 		disable_web_page_preview: true
 	})
 }
 
-const start = async (ctx) => {
+const start = async ctx => {
 	let channel = false
 	if (!ctx.forward.is_bot) {
 		if (ctx.forward.type && ctx.forward.type == 'channel') {
@@ -233,7 +246,7 @@ const start = async (ctx) => {
 			id: Math.abs(ctx.forward.id),
 			name: clean(ctx.forward.first_name) || clean(ctx.forward.title),
 			username: ctx.forward.username,
-			description: '', //TODO Use mtproto
+			description: '', // TODO Use mtproto
 			admin: ctx.from.id,
 			languages: {},
 			categories: {},
@@ -246,7 +259,7 @@ const start = async (ctx) => {
 		ctx.session.singup.db.types = [0]
 	}
 
-	let db = await ctx.database.select({id: Math.abs(ctx.forward.id)}, ctx.session.singup.database)
+	const db = await ctx.database.select({id: Math.abs(ctx.forward.id)}, ctx.session.singup.database)
 	if (db.length != 0) {
 		if (db[0].admin != ctx.from.id) {
 			if (ctx.privilege >= 6) {
@@ -257,13 +270,14 @@ const start = async (ctx) => {
 				ctx.session.singup.type = 'token'
 			}
 		}
+
 		ctx.session.singup.update = true
 	}
 
-	ctx.config.categories.forEach((el) => {
+	ctx.config.categories.forEach(el => {
 		ctx.session.singup.db.categories[el] = false
 	})
-	ctx.config.types.forEach((el) => {
+	ctx.config.types.forEach(el => {
 		ctx.session.singup.db.types[el] = false
 	})
 
@@ -274,7 +288,7 @@ const start = async (ctx) => {
 	})
 }
 
-const info = (ctx) => {
+const info = ctx => {
 	return ctx.replyWithHTML(`
 • Channel or Bot
 <b>Forward a message</b> from your bot or channel in my private!

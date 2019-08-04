@@ -3,7 +3,7 @@ const databases = {
 	b: 'bots'
 }
 
-const base = async (ctx) => {
+const base = async ctx => {
 	if (ctx.privilege <= 4) {
 		return
 	}
@@ -24,7 +24,7 @@ const base = async (ctx) => {
 	})
 }
 
-const send = async (ctx) => {
+const send = async ctx => {
 	const id = Math.abs(Number(ctx.match[2]))
 	const database = databases[ctx.match[1]]
 	let db = await ctx.database.select({
@@ -33,6 +33,7 @@ const send = async (ctx) => {
 	if (!db || db.length <= 0) {
 		return
 	}
+
 	db = db[0]
 	const text = `
 #Report by ${ctx.from.id} (${ctx.from.username})
@@ -53,7 +54,6 @@ ${db.description} Database ${database}
 			]
 		}
 	})
-	return
 }
 
 module.exports = {
