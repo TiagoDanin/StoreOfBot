@@ -62,7 +62,7 @@
 	},
 	"devDependencies": {
 		"env-cmd": "10.0.1",
-		"nodemon": "1.19.1",
+		"nodemon": "1.19.3",
 		"xo": "^0.24.0"
 	},
 	"xo": {
