@@ -57,7 +57,7 @@
 		"nodejs-i18n": "2.3.0",
 		"pg": "^7.12.0",
 		"pg-native": "^3.0.0",
-		"telegraf": "^3.32.0",
+		"telegraf": "^3.33.0",
 		"telegraf-start-parts": "^1.0.0"
 	},
 	"devDependencies": {
