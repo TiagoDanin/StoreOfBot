@@ -53,7 +53,7 @@
 	"dependencies": {
 		"debug": "^4.1.1",
 		"json-stringify-safe": "5.0.1",
-		"moment-timezone": "0.5.26",
+		"moment-timezone": "0.5.27",
 		"nodejs-i18n": "2.3.0",
 		"pg": "^7.14.0",
 		"pg-native": "^3.0.0",
