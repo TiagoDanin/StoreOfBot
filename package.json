@@ -51,7 +51,7 @@
 		"plugins"
 	],
 	"dependencies": {
-		"debug": "^4.2.0",
+		"debug": "^4.3.1",
 		"json-stringify-safe": "5.0.1",
 		"moment-timezone": "0.5.31",
 		"nodejs-i18n": "2.4.0",
