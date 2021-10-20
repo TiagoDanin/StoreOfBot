@@ -25,7 +25,7 @@
 		"i18n": "ls | grep .js | sort | npx nodejs-i18n --value | msgmerge --backup=off --update locales/pt.po /dev/stdin"
 	},
 	"engines": {
-		"node": ">=9.9.0"
+		"node": ">=v14.18.1"
 	},
 	"private": false,
 	"repository": {
